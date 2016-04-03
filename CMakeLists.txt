@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 2.6)
 
-project(parse)
+project(dank-dns)
 
 # Location of header files
 include_directories(include)
@@ -9,11 +9,11 @@ include_directories(include)
 file(GLOB SOURCES "src/*.cpp")
 
 add_executable(
-    parse
-    ${SOURCES}
+  loader
+  ${SOURCES}
 )
 
-target_link_libraries(parse pcap)
+target_link_libraries(loader pcap)
 set(CMAKE_CXX_FLAGS "-O3 -Wall")
 set(CMAKE_C_FLAGS "-O3 -Wall")
 

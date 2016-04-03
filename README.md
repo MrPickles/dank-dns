@@ -27,11 +27,12 @@ DankDNS is a DNS pcap processing tool that will all your dreams come true by tak
    cmake /path/to/repo
    make
    ```
+
 ## Usage
 
 This part is subject to change (drastically). But for right now, usage should probably be something like the following:
 
 ```
-./parse <directory full of pcaps> <output directory>
+./loader <directory full of pcaps> <output directory>
 ```
 
