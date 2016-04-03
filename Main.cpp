@@ -165,7 +165,7 @@ inline uint64_t getTimeMilliseconds() {
 
 int main(int argc, char **argv) {
   if(argc < 3) {
-    fprintf(stderr, "Usage: %s <capture dir> <output dir> [anomalous file] [start file #] [end file #]\n", argv[0]);
+    fprintf(stderr, "Usage: %s <capture dir> <output dir> [start file #] [end file #]\n", argv[0]);
     exit(1);
   }
 
