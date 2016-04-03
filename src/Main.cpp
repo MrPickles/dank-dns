@@ -35,8 +35,8 @@ struct Packet {
 //
 
 struct QRPacketPair {
-  Packet q;
-  Packet r;
+  Packet query;
+  Packet response;
   bool ready;
 };
 
@@ -55,8 +55,8 @@ bool isFirstCapture = true;
 
 void processQueryResponse(QRPacketPair *pPair) {
   DNSQuery query = { 0 };
-  Packet *q = &pPair->q;
-  Packet *r = &pPair->r;
+  Packet *q = &pPair->query;
+  Packet *r = &pPair->response;
 
   // Parsing the DNS response for error conditions
   query.error = dnsParseResponse(r->payload, r->size);
@@ -113,15 +113,15 @@ void handlePacket(uint8_t *arg, const struct pcap_pkthdr *header,
     if(destIP == OLD_ADDRESS || destIP == NEW_ADDRESS) {
       uint64_t uniqueID = ((uint64_t)sourceIP << 32) | ((uint64_t)sourcePort << 16) | queryID;
 
-      packets[packetAdd].q.uniqueID = uniqueID;
-      packets[packetAdd].q.time = time;
-      packets[packetAdd].q.curCaptureTime = captureLastTime - captureStartTime;
-      packets[packetAdd].q.lastCaptureTime = lastCaptureTime;
-      packets[packetAdd].q.overallCaptureTime = totalCaptureTime;
-      packets[packetAdd].q.sourceIP = sourceIP;
-      packets[packetAdd].q.destIP = destIP;
-      packets[packetAdd].q.size = payloadUDPSize;
-      memcpy(packets[packetAdd].q.payload, payloadUDP, payloadUDPSize);
+      packets[packetAdd].query.uniqueID = uniqueID;
+      packets[packetAdd].query.time = time;
+      packets[packetAdd].query.curCaptureTime = captureLastTime - captureStartTime;
+      packets[packetAdd].query.lastCaptureTime = lastCaptureTime;
+      packets[packetAdd].query.overallCaptureTime = totalCaptureTime;
+      packets[packetAdd].query.sourceIP = sourceIP;
+      packets[packetAdd].query.destIP = destIP;
+      packets[packetAdd].query.size = payloadUDPSize;
+      memcpy(packets[packetAdd].query.payload, payloadUDP, payloadUDPSize);
 
       packets[packetAdd].ready = false;
       packetAdd++;
@@ -130,16 +130,16 @@ void handlePacket(uint8_t *arg, const struct pcap_pkthdr *header,
       uint64_t uniqueID = ((uint64_t)destIP << 32) | ((uint64_t)destPort << 16) | queryID;
 
       for(int i = packetAdd - 1; i >= packetProc; i--) {
-        if(packets[i].q.uniqueID == uniqueID) {
-          packets[i].r.uniqueID = uniqueID;
-          packets[i].r.time = time;
-          packets[i].r.curCaptureTime = captureLastTime - captureStartTime;
-          packets[i].r.lastCaptureTime = lastCaptureTime;
-          packets[i].r.overallCaptureTime = totalCaptureTime;
-          packets[i].r.sourceIP = sourceIP;
-          packets[i].r.destIP = destIP;
-          packets[i].r.size = payloadUDPSize;
-          memcpy(packets[i].r.payload, payloadUDP, payloadUDPSize);
+        if(packets[i].query.uniqueID == uniqueID) {
+          packets[i].response.uniqueID = uniqueID;
+          packets[i].response.time = time;
+          packets[i].response.curCaptureTime = captureLastTime - captureStartTime;
+          packets[i].response.lastCaptureTime = lastCaptureTime;
+          packets[i].response.overallCaptureTime = totalCaptureTime;
+          packets[i].response.sourceIP = sourceIP;
+          packets[i].response.destIP = destIP;
+          packets[i].response.size = payloadUDPSize;
+          memcpy(packets[i].response.payload, payloadUDP, payloadUDPSize);
           packets[i].ready = true;
 
           break;
