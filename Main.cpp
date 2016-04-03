@@ -1,34 +1,17 @@
-#include <algorithm>
-#include <arpa/inet.h>
 #include <assert.h>
-#include <bitset>
-#include <ctype.h>
 #include <dirent.h>
-#include <list>
-#include <math.h>
-#include <netinet/ip.h>
 #include <netinet/udp.h>
-#include <regex.h>
 #include <pcap/pcap.h>
-#include <sparsehash/dense_hash_map>
-#include <sparsehash/dense_hash_set>
-#include <sparsehash/sparse_hash_map>
-#include <sparsehash/sparse_hash_set>
 #include <stdint.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <sys/stat.h>
-#include <sys/time.h>
-#include <vector>
 
 #include "Config.h"
-#include "nameser.h"
 #include "ParseDNS.h"
-#include "StringHash.h"
 
 using namespace std;
-using namespace google;
 
 struct Packet {
   uint64_t uniqueID;
@@ -311,9 +294,7 @@ int main(int argc, char **argv) {
   }
 
   free(entries);
-
   printf("\n");
-
   fclose(capturelenLog);
 }
 
