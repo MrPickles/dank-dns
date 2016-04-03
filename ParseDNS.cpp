@@ -9,6 +9,8 @@
 #include "Config.h"
 #include "StringHash.h"
 
+#define UNUSED(x) (void(x))
+
 using namespace google;
 using namespace std;
 
@@ -529,6 +531,13 @@ int dnsParseQuery(DNSQuery *query, const uint8_t *data, uint32_t size) {
     uint8_t edns0Ver = *(dCur + 6);
     uint16_t z = ntohs(*(uint16_t *)(dCur + 7));
     uint16_t dataSize = ntohs(*(uint16_t *)(dCur + 9));
+
+    // Hush warning for unused variables.
+    UNUSED(name);
+    UNUSED(udpSize);
+    UNUSED(extRCODE);
+    UNUSED(edns0Ver);
+    UNUSED(dataSize);
 
     if(type == 0x0029 && z == 0x8000) {
       query->isDNSSEC = true;

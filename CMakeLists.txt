@@ -6,9 +6,9 @@ add_executable(
     parse
     Main.cpp
     ParseDNS.cpp
-	SipHash.cpp
+    SipHash.cpp
 )
 target_link_libraries(parse pcap rt)
-set(CMAKE_CXX_FLAGS "-O3")
-set(CMAKE_C_FLAGS "-O3")
+set(CMAKE_CXX_FLAGS "-O3 -Wall")
+set(CMAKE_C_FLAGS "-O3 -Wall")
 
