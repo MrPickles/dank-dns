@@ -183,6 +183,8 @@ int main(int argc, char **argv) {
     exit(1);
   }
 
+  packets = new QRPacketPair[200000];
+
   // Using this file to record the capture length (in time) for each file
   FILE *capturelenLog;
   char filePath[512];
