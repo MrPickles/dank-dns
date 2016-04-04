@@ -188,13 +188,8 @@ int main(int argc, char **argv) {
   packets = new QRPacketPair[200000];
 
   // Using this file to record the capture length (in time) for each file
-  FILE *capturelenLog;
   char filePath[512];
   sprintf(filePath, "%s/%s", outputDir, "capturelen.log");
-  if((capturelenLog = fopen(filePath, "w")) == NULL) {
-    fprintf(stderr, "Could not open output log file '%s'\n", filePath);
-    exit(1);
-  }
 
   int numEntriesParsed = 0;
 
@@ -219,7 +214,7 @@ int main(int argc, char **argv) {
 
         static double totalProcTime = 0;
         double perFileProcTime = (e > eStart) ? (totalProcTime / (e - eStart)) : 0;
-        printf("\rProcessing file %s [%04d/%04d] (Avg Proc Time = %lf ms)",
+        printf("\rProcessing file %s [%04d/%04d] (Avg Proc Time = %lf ms)\n",
                filePath, (e - eStart), (eEnd - eStart), perFileProcTime);
         fflush(stdout);
 
@@ -295,7 +290,6 @@ int main(int argc, char **argv) {
         isFirstCapture = false;
         lastCaptureTime = (captureLastTime - captureStartTime);
         totalCaptureTime += lastCaptureTime;
-        fprintf(capturelenLog, "%lu\n", lastCaptureTime);
 
         uint64_t endProcTime = getTimeMilliseconds();
         totalProcTime += (endProcTime - startProcTime);
@@ -316,7 +310,5 @@ int main(int argc, char **argv) {
   }
 
   free(entries);
-  printf("\n");
-  fclose(capturelenLog);
 }
 
