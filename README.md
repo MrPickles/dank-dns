@@ -11,7 +11,7 @@ DankDNS is a DNS pcap processing tool that will all your dreams come true by tak
 
 1. Install dependencies.
    ```
-   sudo apt-get cmake libpcap-dev
+   sudo apt-get install cmake libpcap-dev -y
    git clone https://github.com/sparsehash/sparsehash && cd sparsehash
    ./configure && make && sudo make install
    ```
