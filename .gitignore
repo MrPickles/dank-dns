@@ -8,3 +8,6 @@ install_manifest.txt
 # Output binary
 loader
 
+# Vim files
+*.swo
+*.swp
