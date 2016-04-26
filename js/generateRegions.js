@@ -5,7 +5,7 @@ var fs = require('fs'),
     timezoner = require('timezoner');
 
 if (!process.argv[2]) {
-  console.error('usage: node %s <regions.tsv path>', path.basename(process.argv[1]));
+  console.error('usage: node %s <regions.tsv path> [Google API key for timezone]', path.basename(process.argv[1]));
   process.exit(1);
 }
 
@@ -61,7 +61,7 @@ reader.on('close', function() {
             d();
           }
         },
-        {key : 'AIzaSyAHLiZ3Q7t-TEdhiHelR2iVMQKe2knlcpo'}
+        {key : process.argv[3]}
       );
     },
     function(err) {
