@@ -1,6 +1,8 @@
 var mongoose = require('mongoose'),
     path = require('path'),
-    pcap = require('parse-pcap'),
+    fs = require('fs'),
+    zlib = require('zlib'),
+    pcap = require('pcap-parser'),
     dnsParser = require('native-dns-packet');
 
 var chalk = require('chalk');
@@ -15,14 +17,17 @@ process.on('message', function(msg) {
     process.exit();
   } else if (msg.filename) {
     processPCAP(msg.filename);
-    process.send('finished');
+
   }
 });
 
 function processPCAP(filename) {
-  var analyzer = new pcap(filename);
+  var fileStream = fs.createReadStream(filename);
+  var decompressor = zlib.createGunzip();
+  fileStream.pipe(decompressor);
+  var analyzer = new pcap.parse(decompressor);
   console.log(chalk.blue('starting %s'), path.basename(filename));
-  analyzer.packets.forEach(function(packet) {
+  analyzer.on('packet', function(packet) {
     var IPPacket = packet.data.slice(14); // ethernet header is 14 bytes
     var srcIP = IPPacket.slice(12, 16);
     var dstIP = IPPacket.slice(16, 20);
@@ -48,5 +53,9 @@ function processPCAP(filename) {
       }
     }
   });
-  console.log(chalk.green('finished %s'), path.basename(filename));
+  analyzer.on('end', function() {
+    console.log(chalk.green('finished %s'), path.basename(filename));
+    process.send('finished');
+  });
+
 }
