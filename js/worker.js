@@ -30,8 +30,7 @@ function processPCAP(filename) {
   var decompressor = zlib.createGunzip();
   fileStream.pipe(decompressor);
   var analyzer = new pcap.parse(decompressor);
-  console.log(chalk.blue('starting %s'), basename);
-  console.log(chalk.yellow('Time of first packet is ' + fileDate.toString()));
+  console.log(chalk.blue('starting %s - ') + chalk.yellow('Time of first packet is %s'), basename, fileDate);
   var processedPackets = 0;
   analyzer.on('packet', function(packet) {
     var IPPacket = packet.data.slice(14); // ethernet header is 14 bytes

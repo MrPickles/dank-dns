@@ -1,0 +1,416 @@
+{
+  "abva": {
+    "lat": 39.043757,
+    "lon": -77.487442,
+    "timezoneId": "America/New_York",
+    "timezoneName": "Eastern Daylight Time"
+  },
+  "atga": {
+    "lat": 33.748995,
+    "lon": -84.387982,
+    "timezoneId": "America/New_York",
+    "timezoneName": "Eastern Daylight Time"
+  },
+  "aknz": {
+    "lat": -36.84846,
+    "lon": 174.763332,
+    "timezoneId": "Pacific/Auckland",
+    "timezoneName": "New Zealand Standard Time"
+  },
+  "bede": {
+    "lat": 52.520007,
+    "lon": 13.3833,
+    "timezoneId": "Europe/Berlin",
+    "timezoneName": "Central European Summer Time"
+  },
+  "btmw": {
+    "lat": -15.786111,
+    "lon": 35.005833,
+    "timezoneId": "Africa/Blantyre",
+    "timezoneName": "Central Africa Time"
+  },
+  "boma": {
+    "lat": 42.360082,
+    "lon": -71.05888,
+    "timezoneId": "America/New_York",
+    "timezoneName": "Eastern Daylight Time"
+  },
+  "baar": {
+    "lat": -34.603723,
+    "lon": -58.381593,
+    "timezoneId": "America/Cordoba",
+    "timezoneName": "Argentina Standard Time"
+  },
+  "bbca": {
+    "lat": 34.180839,
+    "lon": -118.308966,
+    "timezoneId": "America/Los_Angeles",
+    "timezoneName": "Pacific Daylight Time"
+  },
+  "caeg": {
+    "lat": 30.04442,
+    "lon": 31.235712,
+    "timezoneId": "Africa/Cairo",
+    "timezoneName": "Eastern European Standard Time"
+  },
+  "cgca": {
+    "lat": 51.048615,
+    "lon": -114.070846,
+    "timezoneId": "America/Edmonton",
+    "timezoneName": "Mountain Daylight Time"
+  },
+  "chsg": {
+    "lat": 1.34501,
+    "lon": 103.983209,
+    "timezoneId": "Asia/Singapore",
+    "timezoneName": "Singapore Standard Time"
+  },
+  "ctza": {
+    "lat": -33.924869,
+    "lon": 18.424055,
+    "timezoneId": "Africa/Johannesburg",
+    "timezoneName": "South Africa Standard Time"
+  },
+  "chil": {
+    "lat": 41.878114,
+    "lon": -87.629798,
+    "timezoneId": "America/Chicago",
+    "timezoneName": "Central Daylight Time"
+  },
+  "cpmd": {
+    "lat": 38.989697,
+    "lon": -76.93776,
+    "timezoneId": "America/New_York",
+    "timezoneName": "Eastern Daylight Time"
+  },
+  "coar": {
+    "lat": -31.39893,
+    "lon": -64.182129,
+    "timezoneId": "America/Cordoba",
+    "timezoneName": "Argentina Standard Time"
+  },
+  "dkbd": {
+    "lat": 23.810332,
+    "lon": 90.412518,
+    "timezoneId": "Asia/Dhaka",
+    "timezoneName": "Bangladesh Standard Time"
+  },
+  "dbae": {
+    "lat": 25.204849,
+    "lon": 55.270783,
+    "timezoneId": "Asia/Dubai",
+    "timezoneName": "Gulf Standard Time"
+  },
+  "dbza": {
+    "lat": -29.85868,
+    "lon": 31.02184,
+    "timezoneId": "Africa/Johannesburg",
+    "timezoneName": "South Africa Standard Time"
+  },
+  "duie": {
+    "lat": 53.349805,
+    "lon": -6.26031,
+    "timezoneId": "Europe/Dublin",
+    "timezoneName": "Irish Standard Time"
+  },
+  "ffde": {
+    "lat": 50.110922,
+    "lon": 8.682127,
+    "timezoneId": "Europe/Berlin",
+    "timezoneName": "Central European Summer Time"
+  },
+  "hkcn": {
+    "lat": 22.396428,
+    "lon": 114.109497,
+    "timezoneId": "Asia/Hong_Kong",
+    "timezoneName": "Hong Kong Standard Time"
+  },
+  "istr": {
+    "lat": 41.00527,
+    "lon": 28.97696,
+    "timezoneId": "Europe/Istanbul",
+    "timezoneName": "Eastern European Summer Time"
+  },
+  "jvfl": {
+    "lat": 30.332184,
+    "lon": -81.655651,
+    "timezoneId": "America/New_York",
+    "timezoneName": "Eastern Daylight Time"
+  },
+  "jkid": {
+    "lat": -6.208763,
+    "lon": 106.845599,
+    "timezoneId": "Asia/Jakarta",
+    "timezoneName": "Western Indonesia Time"
+  },
+  "jbsa": {
+    "lat": -26.204103,
+    "lon": 28.047305,
+    "timezoneId": "Africa/Johannesburg",
+    "timezoneName": "South Africa Standard Time"
+  },
+  "kmnp": {
+    "lat": 27.7,
+    "lon": 85.333333,
+    "timezoneId": "Asia/Katmandu",
+    "timezoneName": "Nepal Time"
+  },
+  "kijm": {
+    "lat": 17.983333,
+    "lon": -76.8,
+    "timezoneId": "America/Jamaica",
+    "timezoneName": "Eastern Standard Time"
+  },
+  "kfat": {
+    "lat": 46.62794,
+    "lon": 14.30899,
+    "timezoneId": "Europe/Vienna",
+    "timezoneName": "Central European Summer Time"
+  },
+  "ktsd": {
+    "lat": 15.500654,
+    "lon": 32.559899,
+    "timezoneId": "Africa/Khartoum",
+    "timezoneName": "East Africa Time"
+  },
+  "lpbo": {
+    "lat": -16.5,
+    "lon": -68.15,
+    "timezoneId": "America/La_Paz",
+    "timezoneName": "Bolivia Time"
+  },
+  "louk": {
+    "lat": 51.507351,
+    "lon": -0.127758,
+    "timezoneId": "Europe/London",
+    "timezoneName": "British Summer Time"
+  },
+  "laca": {
+    "lat": 34.052234,
+    "lon": -118.243685,
+    "timezoneId": "America/Los_Angeles",
+    "timezoneName": "Pacific Daylight Time"
+  },
+  "lsng": {
+    "lat": 6.524379,
+    "lon": 3.379206,
+    "timezoneId": "Africa/Lagos",
+    "timezoneName": "West Africa Standard Time"
+  },
+  "lyfr": {
+    "lat": 45.764043,
+    "lon": 4.835659,
+    "timezoneId": "Europe/Paris",
+    "timezoneName": "Central European Summer Time"
+  },
+  "mlph": {
+    "lat": 14.599512,
+    "lon": 120.984219,
+    "timezoneId": "Asia/Manila",
+    "timezoneName": "Philippine Standard Time"
+  },
+  "mcmx": {
+    "lat": 19.432608,
+    "lon": -99.133208,
+    "timezoneId": "America/Mexico_City",
+    "timezoneName": "Central Daylight Time"
+  },
+  "mcva": {
+    "lat": 38.933868,
+    "lon": -77.17726,
+    "timezoneId": "America/New_York",
+    "timezoneName": "Eastern Daylight Time"
+  },
+  "mifl": {
+    "lat": 25.76168,
+    "lon": -80.19179,
+    "timezoneId": "America/New_York",
+    "timezoneName": "Eastern Daylight Time"
+  },
+  "mnuk": {
+    "lat": 53.480759,
+    "lon": -2.242631,
+    "timezoneId": "Europe/London",
+    "timezoneName": "British Summer Time"
+  },
+  "moca": {
+    "lat": 45.501689,
+    "lon": -73.567256,
+    "timezoneId": "America/Toronto",
+    "timezoneName": "Eastern Daylight Time"
+  },
+  "mude": {
+    "lat": 48.135125,
+    "lon": 11.581981,
+    "timezoneId": "Europe/Berlin",
+    "timezoneName": "Central European Summer Time"
+  },
+  "nyny": {
+    "lat": 40.712784,
+    "lon": -74.005941,
+    "timezoneId": "America/New_York",
+    "timezoneName": "Eastern Daylight Time"
+  },
+  "nqar": {
+    "lat": -38.952444,
+    "lon": -68.064139,
+    "timezoneId": "America/Cordoba",
+    "timezoneName": "Argentina Standard Time"
+  },
+  "otca": {
+    "lat": 45.42153,
+    "lon": -75.697193,
+    "timezoneId": "America/Toronto",
+    "timezoneName": "Eastern Daylight Time"
+  },
+  "paca": {
+    "lat": 37.441883,
+    "lon": -122.143019,
+    "timezoneId": "America/Los_Angeles",
+    "timezoneName": "Pacific Daylight Time"
+  },
+  "peau": {
+    "lat": -31.953513,
+    "lon": 115.857047,
+    "timezoneId": "Australia/Perth",
+    "timezoneName": "Australian Western Standard Time"
+  },
+  "poor": {
+    "lat": 45.523062,
+    "lon": -122.676482,
+    "timezoneId": "America/Los_Angeles",
+    "timezoneName": "Pacific Daylight Time"
+  },
+  "prcz": {
+    "lat": 50.075538,
+    "lon": 14.4378,
+    "timezoneId": "Europe/Prague",
+    "timezoneName": "Central European Summer Time"
+  },
+  "pvvu": {
+    "lat": -17.733251,
+    "lon": 168.327325,
+    "timezoneId": "Pacific/Efate",
+    "timezoneName": "Vanuatu Standard Time"
+  },
+  "rodm": {
+    "lat": 15.301389,
+    "lon": -61.388333,
+    "timezoneId": "America/Dominica",
+    "timezoneName": "Atlantic Standard Time"
+  },
+  "sbza": {
+    "lat": -33.027698,
+    "lon": 17.917631,
+    "timezoneId": "Africa/Johannesburg",
+    "timezoneName": "South Africa Standard Time"
+  },
+  "sfca": {
+    "lat": 37.774929,
+    "lon": -122.419416,
+    "timezoneId": "America/Los_Angeles",
+    "timezoneName": "Pacific Daylight Time"
+  },
+  "sjcr": {
+    "lat": 9.928069,
+    "lon": -84.090725,
+    "timezoneId": "America/Costa_Rica",
+    "timezoneName": "Central Standard Time"
+  },
+  "sewa": {
+    "lat": 47.606209,
+    "lon": -122.332071,
+    "timezoneId": "America/Los_Angeles",
+    "timezoneName": "Pacific Daylight Time"
+  },
+  "sekr": {
+    "lat": 37.566535,
+    "lon": 126.977969,
+    "timezoneId": "Asia/Seoul",
+    "timezoneName": "Korean Standard Time"
+  },
+  "sgsg": {
+    "lat": 1.352083,
+    "lon": 103.819836,
+    "timezoneId": "Asia/Singapore",
+    "timezoneName": "Singapore Standard Time"
+  },
+  "sobg": {
+    "lat": 42.697708,
+    "lon": 23.321868,
+    "timezoneId": "Europe/Sofia",
+    "timezoneName": "Eastern European Summer Time"
+  },
+  "sggd": {
+    "lat": 12.056097,
+    "lon": -61.7488,
+    "timezoneId": "America/Grenada",
+    "timezoneName": "Atlantic Standard Time"
+  },
+  "syau": {
+    "lat": -33.867487,
+    "lon": 151.20699,
+    "timezoneId": "Australia/Sydney",
+    "timezoneName": "Australian Eastern Standard Time"
+  },
+  "taee": {
+    "lat": 59.436961,
+    "lon": 24.753575,
+    "timezoneId": "Europe/Tallinn",
+    "timezoneName": "Eastern European Summer Time"
+  },
+  "tafi": {
+    "lat": 61.498151,
+    "lon": 23.761025,
+    "timezoneId": "Europe/Helsinki",
+    "timezoneName": "Eastern European Summer Time"
+  },
+  "tojp": {
+    "lat": 35.689487,
+    "lon": 139.691706,
+    "timezoneId": "Asia/Tokyo",
+    "timezoneName": "Japan Standard Time"
+  },
+  "trca": {
+    "lat": 43.653226,
+    "lon": -79.383184,
+    "timezoneId": "America/Toronto",
+    "timezoneName": "Eastern Daylight Time"
+  },
+  "tuit": {
+    "lat": 45.070312,
+    "lon": 7.686856,
+    "timezoneId": "Europe/Rome",
+    "timezoneName": "Central European Summer Time"
+  },
+  "tutn": {
+    "lat": 36.806495,
+    "lon": 10.181532,
+    "timezoneId": "Africa/Tunis",
+    "timezoneName": "Central European Standard Time"
+  },
+  "viat": {
+    "lat": 48.208174,
+    "lon": 16.373819,
+    "timezoneId": "Europe/Vienna",
+    "timezoneName": "Central European Summer Time"
+  },
+  "wapl": {
+    "lat": 52.229676,
+    "lon": 21.012229,
+    "timezoneId": "Europe/Warsaw",
+    "timezoneName": "Central European Summer Time"
+  },
+  "wtnz": {
+    "lat": -41.28646,
+    "lon": 174.776236,
+    "timezoneId": "Pacific/Auckland",
+    "timezoneName": "New Zealand Standard Time"
+  },
+  "wpca": {
+    "lat": 49.899754,
+    "lon": -97.137494,
+    "timezoneId": "America/Winnipeg",
+    "timezoneName": "Central Daylight Time"
+  }
+}

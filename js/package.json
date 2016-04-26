@@ -15,6 +15,7 @@
     "moment-timezone": "^0.5.3",
     "mongoose": "^4.4.13",
     "native-dns-packet": "^0.1.1",
-    "pcap-parser": "^0.2.1"
+    "pcap-parser": "^0.2.1",
+    "timezoner": "^0.1.9"
   }
 }
