@@ -31,6 +31,7 @@ if (cluster.isMaster) {
   }
 
   console.log(chalk.white('[Info] Spawning %d workers for a job queue of %d'), workers, jobs.length);
+  var totalPacketsProcessed = 0;
 
   for (var i = 1; i <= workers; i++) {
     (function(i) {
@@ -43,7 +44,9 @@ if (cluster.isMaster) {
         console.log(chalk.red('Worker %d exited'), i);
       });
       worker.on('message', function(msg) {
-        if (msg === 'finished') { // worker finished a job
+        if (msg.finished) { // worker finished a job
+          totalPacketsProcessed += msg.packets;
+          console.log(chalk.green('Worker finished processing %d packets'), msg.packets);
           if (jobs.length > 0) { // more jobs to process
             var anotherJob = jobs.pop();
             worker.send({
@@ -58,6 +61,9 @@ if (cluster.isMaster) {
       });
     })(i);
   }
+  process.on('exit', function() {
+    console.log(chalk.green('Total packets processed: %d'), totalPacketsProcessed);
+  });
 }
 
 if (cluster.isWorker) {

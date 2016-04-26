@@ -2,6 +2,7 @@ var mongoose = require('mongoose'),
     path = require('path'),
     fs = require('fs'),
     zlib = require('zlib'),
+    moment = require('moment'),
     pcap = require('pcap-parser'),
     dnsParser = require('native-dns-packet');
 
@@ -21,12 +22,17 @@ process.on('message', function(msg) {
   }
 });
 
+// base filename format - pcap.nyny.2016033116.gz
 function processPCAP(filename) {
+  var basename = path.basename(filename);
+  var fileDate = moment(basename, 'YYYYMMDDHH');
   var fileStream = fs.createReadStream(filename);
   var decompressor = zlib.createGunzip();
   fileStream.pipe(decompressor);
   var analyzer = new pcap.parse(decompressor);
-  console.log(chalk.blue('starting %s'), path.basename(filename));
+  console.log(chalk.blue('starting %s'), basename);
+  console.log(chalk.yellow('Time of first packet is ' + fileDate.toString()));
+  var processedPackets = 0;
   analyzer.on('packet', function(packet) {
     var IPPacket = packet.data.slice(14); // ethernet header is 14 bytes
     var srcIP = IPPacket.slice(12, 16);
@@ -41,6 +47,7 @@ function processPCAP(filename) {
 
         try {
           var parsedDNSData = dnsParser.parse(DNSData);
+          processedPackets++;
         } catch(err) {
           // console.log('file: %s | packet %d', path.basename(filename), counter); //malformed packets
         }
@@ -54,8 +61,11 @@ function processPCAP(filename) {
     }
   });
   analyzer.on('end', function() {
-    console.log(chalk.green('finished %s'), path.basename(filename));
-    process.send('finished');
+    console.log(chalk.green('finished %s'), basename);
+    process.send({
+      finished : true,
+      packets : processedPackets
+    });
   });
 
 }
