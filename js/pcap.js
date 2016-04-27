@@ -1,7 +1,8 @@
 var path = require('path'),
     fs = require('fs'),
     os = require('os'),
-    child_process = require('child_process');
+    child_process = require('child_process'),
+    moment = require('moment-timezone');
 
 var chalk = require('chalk');
 
@@ -16,8 +17,16 @@ if (process.argv[3]) {
   workers = parseInt(process.argv[3]);
   if (isNaN(workers)) {
     console.error(chalk.red('[Error] Worker number is invalid'));
+    process.exit(1);
   }
 }
+
+if (!fs.statSync(path.resolve(__dirname, 'regions.json')).isFile()) {
+  console.error(chalk.red('[Error] Run generateRegion.js first to create regions.json'));
+  process.exit(1);
+}
+
+var regions = require('./regions.json');
 
 var inputDir = path.resolve(process.argv[2]);
 var jobs = fs.readdirSync(inputDir).map(function(filename) {
@@ -31,30 +40,37 @@ if (jobs.length < workers) {
 console.log(chalk.white('[Info] Spawning %d workers for a job queue of %d'), workers, jobs.length);
 var totalPacketsProcessed = 0;
 
+function dispatchJob(worker) {
+  if (jobs.length > 0) {
+    var job = jobs.pop();
+    var filenameParse = job.match(/pcap\.(....)\.(\d{10})/);
+    var region = filenameParse[1];
+    var time = filenameParse[2];
+    var startTime = moment.tz(time, 'YYYYMMDDHH', regions[region].timezoneId);
+    worker.send({
+      filename : job,
+      startTime : startTime
+    });
+    console.log(chalk.blue('Sent job [%s] to worker #%d | %d jobs left'), path.basename(job), i, jobs.length);
+    console.log(chalk.yellow('Time of first packet is %s'), startTime);
+  } else {
+    worker.send({
+      reap : true
+    });
+  }
+};
+
 for (var i = 1; i <= workers; i++) {
   (function(i) {
     var worker = child_process.fork(path.resolve(__dirname, 'worker'));
-    var job = jobs.pop();
-    worker.send({
-      filename : job
-    });
+    dispatchJob(worker);
     worker.on('exit', function() {
       console.log(chalk.red('Worker %d exited'), i);
     });
     worker.on('message', function(msg) {
       if (msg.finished) { // worker finished a job
-        totalPacketsProcessed += msg.packets;
-        console.log(chalk.green('Worker finished processing %d packets'), msg.packets);
-        if (jobs.length > 0) { // more jobs to process
-          var anotherJob = jobs.pop();
-          worker.send({
-            filename : anotherJob
-          });
-        } else { // no more jobs
-          worker.send({
-            reap : true
-          });
-        }
+        console.log(chalk.green('Worker #%d finished processing %d packets from %s'), i, msg.packets, path.basename(msg.filename))
+        dispatchJob(worker);
       }
     });
   })(i);

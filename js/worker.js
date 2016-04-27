@@ -2,11 +2,8 @@ var mongoose = require('mongoose'),
     path = require('path'),
     fs = require('fs'),
     zlib = require('zlib'),
-    moment = require('moment'),
     pcap = require('pcap-parser'),
     dnsParser = require('native-dns-packet');
-
-var chalk = require('chalk');
 
 // load Mongoose model
 require('./models/DNS');
@@ -17,20 +14,20 @@ process.on('message', function(msg) {
   if (msg.reap) {
     process.exit();
   } else if (msg.filename) {
-    processPCAP(msg.filename);
+    console.log(new Date(msg.startTime));
+    processPCAP(msg.filename, new Date(msg.startTime));
 
   }
 });
 
 // base filename format - pcap.nyny.2016033116.gz
-function processPCAP(filename) {
+function processPCAP(filename, startTime) {
   var basename = path.basename(filename);
-  var fileDate = moment(basename, 'YYYYMMDDHH');
   var fileStream = fs.createReadStream(filename);
   var decompressor = zlib.createGunzip();
   fileStream.pipe(decompressor);
   var analyzer = new pcap.parse(decompressor);
-  console.log(chalk.blue('starting %s - ') + chalk.yellow('Time of first packet is %s'), basename, fileDate);
+
   var processedPackets = 0;
   analyzer.on('packet', function(packet) {
     var IPPacket = packet.data.slice(14); // ethernet header is 14 bytes
@@ -43,7 +40,6 @@ function processPCAP(filename) {
       var dstPort = UDPPacket.slice(2,4);
       var DNSData = UDPPacket.slice(8); // UDP header is 8 bytes
       if (srcPort.readUInt16BE() === 53 || dstPort.readUInt16BE() === 53) {
-
         try {
           var parsedDNSData = dnsParser.parse(DNSData);
           processedPackets++;
@@ -60,9 +56,9 @@ function processPCAP(filename) {
     }
   });
   analyzer.on('end', function() {
-    console.log(chalk.green('finished %s'), basename);
     process.send({
       finished : true,
+      filename : filename,
       packets : processedPackets
     });
   });
