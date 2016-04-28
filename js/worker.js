@@ -3,7 +3,8 @@ var mongoose = require('mongoose'),
     fs = require('fs'),
     zlib = require('zlib'),
     pcap = require('pcap-parser'),
-    dnsParser = require('native-dns-packet');
+    dnsParser = require('native-dns-packet'),
+    moment = require('moment-timezone');
 
 // load Mongoose model
 require('./models/DNS');
@@ -14,22 +15,23 @@ process.on('message', function(msg) {
   if (msg.reap) {
     process.exit();
   } else if (msg.filename) {
-    console.log(new Date(msg.startTime));
-    processPCAP(msg.filename, new Date(msg.startTime));
-
+    processPCAP(msg.filename, msg.timezoneId);
   }
 });
 
-// base filename format - pcap.nyny.2016033116.gz
-function processPCAP(filename, startTime) {
-  var basename = path.basename(filename);
+function processPCAP(filename, timezoneId) {
+  // Open file stream for decompression
   var fileStream = fs.createReadStream(filename);
   var decompressor = zlib.createGunzip();
   fileStream.pipe(decompressor);
-  var analyzer = new pcap.parse(decompressor);
 
+  // pcap analysis
+  var analyzer = new pcap.parse(decompressor);
   var processedPackets = 0;
+  var malformedPackets = 0;
   analyzer.on('packet', function(packet) {
+    var packetDate = moment.tz((packet.header.timestampSeconds * 1000) + (packet.header.timestampMicroseconds / 1000), timezoneId);
+    //console.log(filename, packetDate.toString());
     var IPPacket = packet.data.slice(14); // ethernet header is 14 bytes
     var srcIP = IPPacket.slice(12, 16);
     var dstIP = IPPacket.slice(16, 20);
@@ -44,6 +46,7 @@ function processPCAP(filename, startTime) {
           var parsedDNSData = dnsParser.parse(DNSData);
           processedPackets++;
         } catch(err) {
+          malformedPackets++;
           // console.log('file: %s | packet %d', path.basename(filename), counter); //malformed packets
         }
         /*
@@ -59,7 +62,8 @@ function processPCAP(filename, startTime) {
     process.send({
       finished : true,
       filename : filename,
-      packets : processedPackets
+      packets : processedPackets,
+      malformed : malformedPackets
     });
   });
 

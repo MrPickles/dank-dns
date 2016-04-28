@@ -1,8 +1,7 @@
 var path = require('path'),
     fs = require('fs'),
     os = require('os'),
-    child_process = require('child_process'),
-    moment = require('moment-timezone');
+    child_process = require('child_process');
 
 var chalk = require('chalk');
 
@@ -39,20 +38,19 @@ if (jobs.length < workers) {
 
 console.log(chalk.white('[Info] Spawning %d workers for a job queue of %d'), workers, jobs.length);
 var totalPacketsProcessed = 0;
+var totalMalformedPackets = 0;
 
 function dispatchJob(worker) {
   if (jobs.length > 0) {
     var job = jobs.pop();
     var filenameParse = job.match(/pcap\.(....)\.(\d{10})/);
     var region = filenameParse[1];
-    var time = filenameParse[2];
-    var startTime = moment.tz(time, 'YYYYMMDDHH', regions[region].timezoneId);
+    var timezoneId = regions[region].timezoneId;
     worker.send({
       filename : job,
-      startTime : startTime
+      timezoneId : timezoneId
     });
     console.log(chalk.blue('Sent job [%s] to worker #%d | %d jobs left'), path.basename(job), i, jobs.length);
-    console.log(chalk.yellow('Time of first packet is %s'), startTime);
   } else {
     worker.send({
       reap : true
@@ -69,12 +67,14 @@ for (var i = 1; i <= workers; i++) {
     });
     worker.on('message', function(msg) {
       if (msg.finished) { // worker finished a job
-        console.log(chalk.green('Worker #%d finished processing %d packets from %s'), i, msg.packets, path.basename(msg.filename))
+        console.log(chalk.green('Worker #%d finished processing %d packets from %s | %d packets were malformed'), i, msg.packets, path.basename(msg.filename), msg.malformed)
+        totalPacketsProcessed += msg.packets;
+        totalMalformedPackets += msg.malformed;
         dispatchJob(worker);
       }
     });
   })(i);
 }
 process.on('exit', function() {
-  console.log(chalk.green('Total packets processed: %d'), totalPacketsProcessed);
+  console.log(chalk.green('Total packets processed: %d | Total malformed packets: %d'), totalPacketsProcessed, totalMalformedPackets);
 });
