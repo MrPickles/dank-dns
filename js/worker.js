@@ -6,20 +6,34 @@ var mongoose = require('mongoose'),
     dnsParser = require('native-dns-packet'),
     moment = require('moment-timezone');
 
+/*
 // load Mongoose model
 require('./models/DNS');
-var DNSPacket = mongoose.model('DNS');
+var DNSModel = mongoose.model('DNS'); // load db model
 
-var i = 0;
+mongoose.connect('mongodb://localhost/dns'); // open db connection
+mongoose.connection.on('error', console.log);
+*/
+var collection;
+var MongoClient = require('mongodb').MongoClient;
+MongoClient.connect('mongodb://localhost/dns', function(err, dbctx) {
+  collection = dbctx.collection('dns');
+  console.log('connected to DB');
+});
+
 process.on('message', function(msg) {
   if (msg.reap) {
+    // Need to disconnect DB
     process.exit();
   } else if (msg.filename) {
-    processPCAP(msg.filename, msg.timezoneId);
+    processPCAP(msg.filename, msg.timezoneId, msg.region);
   }
 });
 
-function processPCAP(filename, timezoneId) {
+var i = 0;
+
+
+function processPCAP(filename, timezoneId, region) {
   // Open file stream for decompression
   var fileStream = fs.createReadStream(filename);
   var decompressor = zlib.createGunzip();
@@ -44,6 +58,27 @@ function processPCAP(filename, timezoneId) {
       if (srcPort.readUInt16BE() === 53 || dstPort.readUInt16BE() === 53) {
         try {
           var parsedDNSData = dnsParser.parse(DNSData);
+          if (parsedDNSData.qr = 1) { // is response
+            var dns = {
+              node : region,
+              time : new Date(packetDate.valueOf()),
+              reqIP : dstIP,
+              resIP : srcIP,
+              header : {
+                aa : parsedDNSData.header.aa,
+                tc : parsedDNSData.header.tc,
+                rd : parsedDNSData.header.rd,
+                ra : parsedDNSData.header.ra,
+                rc : parsedDNSData.header.rcode
+              },
+              question : parsedDNSData.question,
+              DNSSEC : parsedDNSData.edns.type === 0x29 || parsedDNSData.edns.z === 0x8000,
+              answerCount : parsedDNSData.answer.length,
+              authorityCount : parsedDNSData.authority.length,
+              additionalCount : parsedDNSData.additional.length
+            };
+            collection.insert(dns);
+          }
           processedPackets++;
         } catch(err) {
           malformedPackets++;

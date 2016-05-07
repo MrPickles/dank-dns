@@ -48,6 +48,7 @@ function dispatchJob(worker) {
     var timezoneId = regions[region].timezoneId;
     worker.send({
       filename : job,
+      region : region,
       timezoneId : timezoneId
     });
     console.log(chalk.blue('Sent job [%s] to worker #%d | %d jobs left'), path.basename(job), i, jobs.length);

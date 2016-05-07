@@ -16,11 +16,17 @@ var DNSSchema = {
     index : true,
     required : true
   },
+  reqIP : {
+    type : Buffer,
+    index : true,
+    required : true
+  },
+  resIP : {
+    type : Buffer,
+    index : true,
+    required : true
+  },
   header : {
-    id : {
-      type : Number,
-      required : true
-    },
     aa : { // authoritative answer
       type : Boolean,
       required : true
@@ -45,8 +51,7 @@ var DNSSchema = {
   question : [{
     name : {
       type : String,
-      index : true,
-      required : true
+      index : true
     },
     type : {
       type : Number,
@@ -57,25 +62,25 @@ var DNSSchema = {
       type : Number,
       index : true,
       required : true
-    },
-    DNSSEC : { // if edns.type === 0x29 || edns.z === 0x8000
-      type : Boolean,
-      required : true,
-      default : false
-    },
-    answerCount : {
-      type : Number,
-      required : true
-    },
-    authorityCount : {
-      type : Number,
-      required : true
-    },
-    additionalCount : {
-      type : Number,
-      required : true
     }
   }],
+  DNSSEC : { // if edns.type === 0x29 || edns.z === 0x8000
+    type : Boolean,
+    required : true,
+    default : false
+  },
+  answerCount : {
+    type : Number,
+    required : true
+  },
+  authorityCount : {
+    type : Number,
+    required : true
+  },
+  additionalCount : {
+    type : Number,
+    required : true
+  }
 };
 
 var DNS = mongoose.model('DNS', DNSSchema);
