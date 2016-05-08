@@ -16,6 +16,7 @@
     "mongoose": "^4.4.13",
     "native-dns-packet": "^0.1.1",
     "pcap-parser": "^0.2.1",
+    "sequelize": "^3.22.0",
     "timezoner": "^0.1.9"
   }
 }
