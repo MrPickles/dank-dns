@@ -6,6 +6,7 @@ var mongoose = require('mongoose'),
     dnsParser = require('native-dns-packet'),
     moment = require('moment-timezone');
 
+var cacheSize = 30;
 /*
 // load Mongoose model
 require('./models/DNS');
@@ -43,6 +44,9 @@ function processPCAP(filename, timezoneId, region) {
   var analyzer = new pcap.parse(decompressor);
   var processedPackets = 0;
   var malformedPackets = 0;
+
+  var insertCache = new Array(cacheSize);
+  var currInsertCacheIndex = 0;
   analyzer.on('packet', function(packet) {
     var packetDate = moment.tz((packet.header.timestampSeconds * 1000) + (packet.header.timestampMicroseconds / 1000), timezoneId);
     //console.log(filename, packetDate.toString());
@@ -58,7 +62,7 @@ function processPCAP(filename, timezoneId, region) {
       if (srcPort.readUInt16BE() === 53 || dstPort.readUInt16BE() === 53) {
         try {
           var parsedDNSData = dnsParser.parse(DNSData);
-          if (parsedDNSData.qr = 1) { // is response
+          if (parsedDNSData.qr = 1) { // is response, only saving response for now
             var dns = {
               node : region,
               time : new Date(packetDate.valueOf()),
@@ -77,7 +81,12 @@ function processPCAP(filename, timezoneId, region) {
               authorityCount : parsedDNSData.authority.length,
               additionalCount : parsedDNSData.additional.length
             };
-            collection.insert(dns);
+            insertCache[currInsertCacheIndex] = dns;
+            currInsertCacheIndex++;
+            if (currInsertCacheIndex === cacheSize) {
+              collection.insert(insertCache);
+              currInsertCacheIndex = 0;
+            }
           }
           processedPackets++;
         } catch(err) {
@@ -94,6 +103,10 @@ function processPCAP(filename, timezoneId, region) {
     }
   });
   analyzer.on('end', function() {
+    // Final insert
+    if (currInsertCacheIndex > 0) {
+      collection.insert(insertCache.slice(0, currInsertCacheIndex));
+    }
     process.send({
       finished : true,
       filename : filename,
