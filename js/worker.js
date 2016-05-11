@@ -1,3 +1,5 @@
+'use strict';
+
 var mongoose = require('mongoose'),
     path = require('path'),
     fs = require('fs'),
@@ -6,7 +8,7 @@ var mongoose = require('mongoose'),
     dnsParser = require('native-dns-packet'),
     moment = require('moment-timezone');
 
-var cacheSize = 30;
+var cacheSize = 1000;
 /*
 // load Mongoose model
 require('./models/DNS');
@@ -17,19 +19,24 @@ mongoose.connection.on('error', console.log);
 */
 var collection;
 var MongoClient = require('mongodb').MongoClient;
+var dbConnection;
 MongoClient.connect('mongodb://localhost/dns', function(err, dbctx) {
   collection = dbctx.collection('dns');
-  console.log('connected to DB');
+  dbConnection = dbctx;
+  process.send({ready : true});
 });
 
 process.on('message', function(msg) {
   if (msg.reap) {
     // Need to disconnect DB
-    process.exit();
+    dbConnection.close(function() {
+      process.exit();
+    });
   } else if (msg.filename) {
     processPCAP(msg.filename, msg.timezoneId, msg.region);
   }
 });
+
 
 var i = 0;
 
@@ -47,6 +54,18 @@ function processPCAP(filename, timezoneId, region) {
 
   var insertCache = new Array(cacheSize);
   var currInsertCacheIndex = 0;
+  var inserted = 0;
+
+  var bulkInsert = function(arr) {
+    collection.insert(arr, function(err) {
+      if (err) {
+        console.log(err);
+      }
+      inserted += arr.length;
+    });
+  };
+
+  var responsePackets = 0;
   analyzer.on('packet', function(packet) {
     var packetDate = moment.tz((packet.header.timestampSeconds * 1000) + (packet.header.timestampMicroseconds / 1000), timezoneId);
     //console.log(filename, packetDate.toString());
@@ -59,10 +78,21 @@ function processPCAP(filename, timezoneId, region) {
       var srcPort = UDPPacket.slice(0,2);
       var dstPort = UDPPacket.slice(2,4);
       var DNSData = UDPPacket.slice(8); // UDP header is 8 bytes
-      if (srcPort.readUInt16BE() === 53 || dstPort.readUInt16BE() === 53) {
+      if (srcPort.readUInt16BE() === 53 || dstPort.readUInt16BE() === 53) { // if DNS port
         try {
           var parsedDNSData = dnsParser.parse(DNSData);
-          if (parsedDNSData.qr = 1) { // is response, only saving response for now
+          if (parsedDNSData.header.qr === 1) { // is response, only saving response for now
+            responsePackets++;
+
+            // check if DNSSEC
+            var DNSSEC = false;
+            if (parsedDNSData.edns) {
+              DNSSEC = parsedDNSData.edns.type === 0x29 || parsedDNSData.edns.z === 0x8000;
+            } else if (parsedDNSData.edns_options) {
+              DNSSEC = parsedDNSData.edns_options.type === 0x29 || parsedDNSData.edns_options.z === 0x8000;
+            }
+
+            // form db entry
             var dns = {
               node : region,
               time : new Date(packetDate.valueOf()),
@@ -76,22 +106,23 @@ function processPCAP(filename, timezoneId, region) {
                 rc : parsedDNSData.header.rcode
               },
               question : parsedDNSData.question,
-              DNSSEC : parsedDNSData.edns.type === 0x29 || parsedDNSData.edns.z === 0x8000,
+              DNSSEC : DNSSEC,
               answerCount : parsedDNSData.answer.length,
               authorityCount : parsedDNSData.authority.length,
               additionalCount : parsedDNSData.additional.length
             };
             insertCache[currInsertCacheIndex] = dns;
             currInsertCacheIndex++;
+
+            // if ready for bulk insert
             if (currInsertCacheIndex === cacheSize) {
-              collection.insert(insertCache);
               currInsertCacheIndex = 0;
+              bulkInsert(insertCache);
             }
           }
           processedPackets++;
         } catch(err) {
           malformedPackets++;
-          // console.log('file: %s | packet %d', path.basename(filename), counter); //malformed packets
         }
         /*
         console.log(chalk.blue('--------------------------------- Packet %d ---------------------------------'), i);
@@ -105,14 +136,26 @@ function processPCAP(filename, timezoneId, region) {
   analyzer.on('end', function() {
     // Final insert
     if (currInsertCacheIndex > 0) {
-      collection.insert(insertCache.slice(0, currInsertCacheIndex));
+      bulkInsert(insertCache.slice(0, currInsertCacheIndex));
     }
-    process.send({
-      finished : true,
-      filename : filename,
-      packets : processedPackets,
-      malformed : malformedPackets
-    });
+    
+    // wait for mongo to finish
+    var intervalID = setInterval(function() {
+      if (inserted >= responsePackets) {
+        clearInterval(intervalID);
+
+        // ready to request another one
+        process.send({
+          finished : true,
+          filename : filename,
+          packets : processedPackets,
+          response : responsePackets,
+          malformed : malformedPackets
+        });
+
+      }
+    }, 100);
   });
 
 }
+
