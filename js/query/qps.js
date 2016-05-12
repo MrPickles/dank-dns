@@ -1,6 +1,5 @@
 'use strict';
 
-var MongoClient = require('mongodb').MongoClient;
 var async = require('async');
 var utils = require('./utils.js');
 var db;
@@ -11,7 +10,7 @@ var hour = minute * 60;
 var day = hour * 24;
 
 var start = new Date('2016-03-08 11:00:00');
-var stop = new Date('2016-03-08 13:00:00');
+var stop = new Date('2016-03-08 12:00:00');
 
 /*
 var start = new Date('2016-03-08T11:00:34.060Z');
@@ -28,14 +27,12 @@ var timeStop;
 
 async.waterfall([
   function(d) {
-    MongoClient.connect('mongodb://localhost/dns', function(err, dbctx) {
-      collection = dbctx.collection('dns');
-      db = dbctx;
-      d(err);
-    });
+    utils.connect(d);
   },
-  function(d) {
-    console.log('Starting');
+  function(conn, d) {
+    console.log('Connected to DB');
+    db = conn;
+    collection = conn.collection('dns');
     timeStart = new Date();
     collection.aggregate([
       { $match : utils.cleanQuery({ 
@@ -49,7 +46,6 @@ async.waterfall([
       }) },
       { $project : { 
         _id : 0,
-        node : 1,
         time : { 
           $add : [
             '$time',
@@ -84,12 +80,6 @@ async.waterfall([
         }
       } },
       { $group : {
-        /*
-        _id : { 
-          time : '$time',
-          node : '$node'
-        },
-        */
         _id : '$time',
         total : { $sum : 1 }
       } },
@@ -101,7 +91,6 @@ async.waterfall([
         ] }
       } },
       { $sort : {
-//        time : 1
         _id : 1
       } }
     ], function(err, results) {
