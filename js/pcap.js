@@ -27,7 +27,7 @@ if (!fs.statSync(path.resolve(__dirname, 'regions.json')).isFile()) {
   process.exit(1);
 }
 
-var regions = require('./regions.json');
+var regions = require('./tools/regions.json');
 
 var inputDir = path.resolve(process.argv[2]);
 var jobs = fs.readdirSync(inputDir).map(function(filename) {
