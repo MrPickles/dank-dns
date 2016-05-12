@@ -19,12 +19,13 @@ var DNSModel = mongoose.model('DNS'); // load db model
 mongoose.connect('mongodb://localhost/dns'); // open db connection
 mongoose.connection.on('error', console.log);
 */
-var collection;
+
 var MongoClient = require('mongodb').MongoClient;
-var dbConnection;
+var dbConnection, collection, filesCollection;
 
 MongoClient.connect(config.db.url, function(err, dbctx) {
   collection = dbctx.collection(config.db.collection);
+  filesCollection = dbctx.collection(config.db.filesCollection);
   dbConnection = dbctx;
   process.send({ready : true});
 });
@@ -36,7 +37,23 @@ process.on('message', function(msg) {
       process.exit();
     });
   } else if (msg.filename) {
-    processPCAP(msg.filename, msg.timezoneId, msg.region);
+    var basename = path.basename(msg.filename);
+    filesCollection.count({filename : basename}, function(err, count) {
+      if (err) {
+        console.error('[Error] MongoDB Driver Error', err);
+      } else if (count === 0) {
+        filesCollection.insert({
+          filename : basename
+        });
+        processPCAP(msg.filename, msg.timezoneId, msg.region);
+      } else {
+        process.send({
+          duplicate : true,
+          filename : basename
+        });
+      }
+    });
+
   }
 });
 

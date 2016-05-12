@@ -2,15 +2,16 @@
 
 var MongoClient = require('mongodb').MongoClient,
     async = require('async'),
-    config = require('./config');
+    config = require('../config');
 
-var dbConnection, collection;
+var dbConnection, collection, filesCollection;
 
 async.waterfall([
   function(d) {
     MongoClient.connect(config.db.url, function(err, dbctx) {
       dbConnection = dbctx;
       collection = dbctx.collection(config.db.collection);
+      filesCollection = dbctx.collection(config.db.filesCollection);
       d(err);
     });
   },
@@ -29,6 +30,11 @@ async.waterfall([
       d(err);
     });
   },
+  function(d) {
+    filesCollection.createIndex({ filename : 1 }, function(err, result) {
+      d(err);
+    })
+  }
 ], function(err) {
   if (err) {
     console.log('[Error] MongoDB Driver', err);
