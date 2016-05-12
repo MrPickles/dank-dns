@@ -3,35 +3,50 @@
 var path = require('path'),
     fs = require('fs'),
     os = require('os'),
-    child_process = require('child_process');
+    child_process = require('child_process'),
+    cmdLineArgs = require('command-line-args');
 
 var chalk = require('chalk');
 
+var cli = cmdLineArgs([
+  { name : 'directory', alias : 'd', type : String, multiple : true },
+  { name : 'workers', alias : 'w', type : Number },
+]);
+
+var options = cli.parse();
+
 // check if capture directory is present
-if (!process.argv[2]) {
-  console.error('usage: node %s <capture dir> [# of workers]', path.basename(process.argv[1]));
+if (!options.directory) {
+  console.error('usage: node %s -d <capture dir> -w [# of workers]', path.basename(process.argv[1]));
   process.exit(1);
 }
 
 var workers = os.cpus().length;
-if (process.argv[3]) {
-  workers = parseInt(process.argv[3]);
+if (options.workers !== undefined) {
+  workers = options.workers;
   if (isNaN(workers)) {
     console.error(chalk.red('[Error] Worker number is invalid'));
     process.exit(1);
   }
 }
 
-if (!fs.statSync(path.resolve(__dirname, 'tools/regions.json')).isFile()) {
-  console.error(chalk.red('[Error] Run generateRegion.js first to create regions.json'));
+try {
+  if (!fs.statSync(path.resolve(__dirname, 'tools/regions.json')).isFile()) {
+    console.error(chalk.red('[Error] Run tools/generateRegion.js first to create regions.json'));
+    process.exit(1);
+  }
+} catch (err) {
+  console.error(chalk.red('[Error] Run tools/generateRegion.js first to create regions.json'));
   process.exit(1);
 }
 
 var regions = require('./tools/regions.json');
 
-var inputDir = path.resolve(process.argv[2]);
-var jobs = fs.readdirSync(inputDir).map(function(filename) {
-  return path.resolve(inputDir, filename)
+var jobs = [];
+options.directory.forEach(function(directory) {
+  fs.readdirSync(directory).forEach(function(file) {
+    jobs.push(path.resolve(directory, file));
+  });
 });
 
 if (jobs.length < workers) {
@@ -55,7 +70,7 @@ function dispatchJob(worker) {
       region : region,
       timezoneId : timezoneId
     });
-    console.log(chalk.white('[Info] Sent job [%s] to worker #%d \t| jobs left: %d'), path.basename(job), worker.workerID, jobs.length);
+    console.log(chalk.white('[Info] Sent job [%s] to worker #%d   \t| jobs left: %d'), path.basename(job), worker.workerID, jobs.length);
   } else {
     worker.send({
       reap : true
@@ -70,7 +85,7 @@ for (var i = 1; i <= workers; i++) {
     var worker = child_process.fork(path.resolve(__dirname, 'worker'));
     worker.workerID = i;
     worker.on('exit', function() {
-      var status = chalk.red('Worker ' + i + ' exited \t');
+      var status = chalk.white('[Info] Worker ' + i + ' exited   \t');
       workersArr.forEach(function(w) {
         if (w.connected) {
           status += chalk.green(w.workerID + ' ');
