@@ -1,3 +1,5 @@
+'use strict';
+
 var path = require('path'),
     fs = require('fs'),
     os = require('os'),
@@ -40,6 +42,8 @@ console.log(chalk.white('[Info] Spawning %d workers for a job queue of %d'), wor
 var totalPacketsProcessed = 0;
 var totalMalformedPackets = 0;
 
+var totalResponsePackets = 0;
+
 function dispatchJob(worker) {
   if (jobs.length > 0) {
     var job = jobs.pop();
@@ -51,7 +55,7 @@ function dispatchJob(worker) {
       region : region,
       timezoneId : timezoneId
     });
-    console.log(chalk.blue('Sent job [%s] to worker #%d | %d jobs left'), path.basename(job), i, jobs.length);
+    console.log(chalk.blue('Sent job [%s] to worker #%d \t| %d jobs left'), path.basename(job), worker.workerID, jobs.length);
   } else {
     worker.send({
       reap : true
@@ -62,20 +66,23 @@ function dispatchJob(worker) {
 for (var i = 1; i <= workers; i++) {
   (function(i) {
     var worker = child_process.fork(path.resolve(__dirname, 'worker'));
-    dispatchJob(worker);
+    worker.workerID = i;
     worker.on('exit', function() {
       console.log(chalk.red('Worker %d exited'), i);
     });
     worker.on('message', function(msg) {
-      if (msg.finished) { // worker finished a job
+      if (msg.ready) { // initial wait for DB connection
+        dispatchJob(worker);
+      } else if (msg.finished) { // worker finished a job
         console.log(chalk.green('Worker #%d finished processing %d packets from %s | %d packets were malformed'), i, msg.packets, path.basename(msg.filename), msg.malformed)
         totalPacketsProcessed += msg.packets;
         totalMalformedPackets += msg.malformed;
+        totalResponsePackets += msg.response;
         dispatchJob(worker);
       }
     });
   })(i);
 }
 process.on('exit', function() {
-  console.log(chalk.green('Total packets processed: %d | Total malformed packets: %d'), totalPacketsProcessed, totalMalformedPackets);
+  console.log(chalk.green('Total | Packets processed: %d | Response packets: %d | Malformed packets: %d'), totalPacketsProcessed, totalResponsePackets, totalMalformedPackets);
 });
