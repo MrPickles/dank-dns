@@ -55,7 +55,7 @@ function dispatchJob(worker) {
       region : region,
       timezoneId : timezoneId
     });
-    console.log(chalk.blue('Sent job [%s] to worker #%d \t| %d jobs left'), path.basename(job), worker.workerID, jobs.length);
+    console.log(chalk.blue('Sent job [%s] to worker #%d \t| jobs left: %d'), path.basename(job), worker.workerID, jobs.length);
   } else {
     worker.send({
       reap : true
@@ -63,12 +63,22 @@ function dispatchJob(worker) {
   }
 };
 
+var workersArr = new Array(workers);
+
 for (var i = 1; i <= workers; i++) {
   (function(i) {
     var worker = child_process.fork(path.resolve(__dirname, 'worker'));
     worker.workerID = i;
     worker.on('exit', function() {
-      console.log(chalk.red('Worker %d exited'), i);
+      var status = chalk.red('Worker ' + i + ' exited \t');
+      workersArr.forEach(function(w) {
+        if (w.connected) {
+          status += chalk.green(w.workerID + ' ');
+        } else {
+          status += chalk.red(w.workerID + ' ');
+        }
+      });
+      console.log(status);
     });
     worker.on('message', function(msg) {
       if (msg.ready) { // initial wait for DB connection
@@ -81,6 +91,7 @@ for (var i = 1; i <= workers; i++) {
         dispatchJob(worker);
       }
     });
+    workersArr[i] = worker;
   })(i);
 }
 process.on('exit', function() {
