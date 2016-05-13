@@ -1,7 +1,41 @@
+#!/usr/bin/env node
 'use strict';
 
-var async = require('async');
-var utils = require('./utils.js');
+var async = require('async'),
+    utils = require('./utils.js'),
+    moment = require('moment'),
+    cmdLineArgs = require('command-line-args');
+
+
+var cli = cmdLineArgs([
+  { name : 'start', alias : 's', description : 'Start time of query "YYYY-MM-DD HH:MM:SS"', type : String },
+  { name : 'end', alias : 'e', description : 'End time of query "YYYY-MM-DD HH:MM:SS"', type : String },
+  { name : 'replicas', alias : 'r', description : 'List of replicas to query, leave blank to default to all replicas', type : String, multiple : true },
+  { name : 'interval', alias : 'i', description : 'Number of minutes for each interval, default : 10', type : Number, defaultValue : 10 }
+]);
+
+var options = cli.parse();
+
+if (!options.start || !options.end) {
+  console.log(cli.getUsage());
+  process.exit(1);
+}
+
+var start = new Date(options.start);
+var stop = new Date(options.end);
+var nodes = options.replicas;
+var sizeInterval = parseInt(options.interval);
+
+if (stop < start) {
+  console.log('[Error] End time is earlier than start time');
+  process.exit(1);
+}
+
+if (sizeInterval <= 0 || isNaN(sizeInterval)) {
+  console.log('[Error] Invalid interval size');
+  process.exit(1);
+}
+
 var db;
 var collection;
 
@@ -9,21 +43,9 @@ var minute = 60;
 var hour = minute * 60;
 var day = hour * 24;
 
-var start = new Date('2016-03-08 11:00:00');
-var stop = new Date('2016-03-08 12:00:00');
+var timeStart, timeStop; // timer
 
-/*
-var start = new Date('2016-03-08T11:00:34.060Z');
-var stop = new Date('2016-03-08T13:00:34.728Z');
-*/
-
-var sizeInterval = 10;
-var nodes = [
-  'cpmd',
-];
-
-var timeStart;
-var timeStop;
+console.log('Querying DB from %s to %s for QPS on %s replica(s) in %d minute intervals', start, stop, nodes ? nodes : 'all', sizeInterval);
 
 async.waterfall([
   function(d) {
@@ -96,13 +118,12 @@ async.waterfall([
     ], function(err, results) {
       timeStop = new Date();
       console.log(results);
-      console.log(timeStop - timeStart, 'ms');
+      console.log('Query time: %d seconds', moment.duration(timeStop - timeStart).asSeconds()); 
       d(err);
     });
   },
 ], function(err) {
   db.close();
-  console.log('Complete');
 });
 
 
