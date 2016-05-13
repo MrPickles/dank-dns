@@ -178,3 +178,6 @@ function processPCAP(filename, timezoneId, region) {
 
 }
 
+process.on('SIGINT', function() {
+  // do nothing
+});

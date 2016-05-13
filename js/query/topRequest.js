@@ -78,7 +78,7 @@ async.waterfall([
     ], function(err, results) {
       timeStop = new Date();
       console.log(results);
-      console.log('Query time: ' + moment.duration(timeStop - timeStart).asSeconds() + ' seconds'); 
+      console.log('Query time: %d seconds', moment.duration(timeStop - timeStart).asSeconds()); 
       d(err);
     });
   },

@@ -5,13 +5,14 @@ var path = require('path'),
     fs = require('fs'),
     os = require('os'),
     child_process = require('child_process'),
+    moment = require('moment'),
     cmdLineArgs = require('command-line-args');
 
 var chalk = require('chalk');
 
 var cli = cmdLineArgs([
   { name : 'directory', alias : 'd', type : String, multiple : true },
-  { name : 'workers', alias : 'w', type : Number },
+  { name : 'workers', alias : 'w', type : Number, defaultValue : os.cpus().length },
 ]);
 
 var options = cli.parse();
@@ -22,13 +23,10 @@ if (!options.directory) {
   process.exit(1);
 }
 
-var workers = os.cpus().length;
-if (options.workers !== undefined) {
-  workers = options.workers;
-  if (isNaN(workers)) {
-    console.error(chalk.red('[Error] Worker number is invalid'));
-    process.exit(1);
-  }
+var workers = options.workers;
+if (isNaN(workers)) {
+  console.error(chalk.red('[Error] Worker number is invalid'));
+  process.exit(1);
 }
 
 try {
@@ -81,6 +79,9 @@ function dispatchJob(worker) {
 
 var workersArr = new Array(workers);
 
+var startTime = new Date();
+var endTime;
+
 for (var i = 1; i <= workers; i++) {
   (function(i) {
     var worker = child_process.fork(path.resolve(__dirname, 'worker'));
@@ -114,10 +115,19 @@ for (var i = 1; i <= workers; i++) {
   })(i);
 }
 process.on('exit', function() {
+  endTime = new Date();
   console.log(chalk.blue('[Result] Total | Packets processed: %d | Response packets: %d | Malformed packets: %d'), totalPacketsProcessed, totalResponsePackets, totalMalformedPackets);
+  console.log(chalk.white('[Info] Processing time: %d minutes'), moment.duration(endTime - startTime).asMinutes());
 });
 
+var firstSigInt = true;
 process.on('SIGINT', function() {
-  jobs = []; // clear job queue, wait for workers to end
-  return false;
+  if (firstSigInt) {
+    jobs = []; // clear job queue, wait for workers to end
+    firstSigInt = false;
+    console.log(chalk.yellow('[Warning] ctrl+c detected, clearing work queue and gracefully waiting for workers to finish'));
+    return false;
+  } else {
+    process.exit(1);
+  }
 });
