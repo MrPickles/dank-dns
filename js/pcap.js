@@ -22,7 +22,7 @@ if (process.argv[3]) {
   }
 }
 
-if (!fs.statSync(path.resolve(__dirname, 'regions.json')).isFile()) {
+if (!fs.statSync(path.resolve(__dirname, 'tools/regions.json')).isFile()) {
   console.error(chalk.red('[Error] Run generateRegion.js first to create regions.json'));
   process.exit(1);
 }
@@ -55,7 +55,7 @@ function dispatchJob(worker) {
       region : region,
       timezoneId : timezoneId
     });
-    console.log(chalk.blue('Sent job [%s] to worker #%d \t| jobs left: %d'), path.basename(job), worker.workerID, jobs.length);
+    console.log(chalk.white('[Info] Sent job [%s] to worker #%d \t| jobs left: %d'), path.basename(job), worker.workerID, jobs.length);
   } else {
     worker.send({
       reap : true
@@ -84,10 +84,13 @@ for (var i = 1; i <= workers; i++) {
       if (msg.ready) { // initial wait for DB connection
         dispatchJob(worker);
       } else if (msg.finished) { // worker finished a job
-        console.log(chalk.green('Worker #%d finished processing %d packets from %s | %d packets were malformed'), i, msg.packets, path.basename(msg.filename), msg.malformed)
+        console.log(chalk.green('[Debug] Worker #%d finished processing %d packets from %s | %d packets were malformed'), i, msg.packets, path.basename(msg.filename), msg.malformed)
         totalPacketsProcessed += msg.packets;
         totalMalformedPackets += msg.malformed;
         totalResponsePackets += msg.response;
+        dispatchJob(worker);
+      } else if (msg.duplicate) {
+        console.log(chalk.yellow('[Warning] Duplicate entry in database, skipping file: %s'), msg.filename);
         dispatchJob(worker);
       }
     });
@@ -95,5 +98,5 @@ for (var i = 1; i <= workers; i++) {
   })(i);
 }
 process.on('exit', function() {
-  console.log(chalk.green('Total | Packets processed: %d | Response packets: %d | Malformed packets: %d'), totalPacketsProcessed, totalResponsePackets, totalMalformedPackets);
+  console.log(chalk.blue('[Result] Total | Packets processed: %d | Response packets: %d | Malformed packets: %d'), totalPacketsProcessed, totalResponsePackets, totalMalformedPackets);
 });
