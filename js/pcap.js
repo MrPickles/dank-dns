@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 'use strict';
 
 var path = require('path'),
@@ -114,4 +115,9 @@ for (var i = 1; i <= workers; i++) {
 }
 process.on('exit', function() {
   console.log(chalk.blue('[Result] Total | Packets processed: %d | Response packets: %d | Malformed packets: %d'), totalPacketsProcessed, totalResponsePackets, totalMalformedPackets);
+});
+
+process.on('SIGINT', function() {
+  jobs = []; // clear job queue, wait for workers to end
+  return false;
 });

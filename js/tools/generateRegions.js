@@ -1,3 +1,6 @@
+#!/usr/bin/env node
+'use strict';
+
 var fs = require('fs'),
     readline = require('readline'),
     path = require('path'),
