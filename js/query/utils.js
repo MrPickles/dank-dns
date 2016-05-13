@@ -1,6 +1,9 @@
 'use strict';
 
 var lodash = require('lodash');
+var MongoClient = require('mongodb').MongoClient;
+var path = require('path');
+var config = require(path.join(__dirname, '../', 'config.js'));
 
 var helpers = {
   cleanQuery : function(query) {
@@ -27,6 +30,9 @@ var helpers = {
     }
 
     return result;
+  },
+  connect : function(cb) {
+    MongoClient.connect(config.db.url, cb);
   }
 };
 
