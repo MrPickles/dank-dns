@@ -9,8 +9,7 @@
 #include "util.h"
 #include "packetHandle.h"
 
-void *worker_job(void *args) {
-  worker_t *worker = (worker_t *)args;
+void worker_job(worker_t *worker) {
   int read_fd = worker->parent_to_worker_fd[0];
   int write_fd = worker->worker_to_parent_fd[1];
 
@@ -29,7 +28,7 @@ void *worker_job(void *args) {
 #if DEBUG
       printf("worker %d received a terminate code\n", worker->index);
 #endif
-      return NULL;
+      exit(0); // exit worker process
     } else if (opcode == JOB_CODE) {
 #if DEBUG
       printf("worker %d received job code\n", worker->index);
@@ -49,6 +48,5 @@ void *worker_job(void *args) {
       fprintf(stderr, "Invalid opcode received.\n");
     }
   }
-  return NULL;
 }
 

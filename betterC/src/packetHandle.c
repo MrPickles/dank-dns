@@ -11,8 +11,11 @@
 
 #include "util.h"
 
+int packetCount = 0;
+
 void handlePacketCB(uint8_t *arg, const struct pcap_pkthdr *header,
     const uint8_t *packet) {
+
   const int datalinkOffset = *((int *)arg);
 
   // Grab IP information, and apply any necessary rules.
@@ -44,6 +47,8 @@ void handlePacketCB(uint8_t *arg, const struct pcap_pkthdr *header,
     fprintf(stderr, "Payload > 2048 bytes, skipping\n");
     return;
   }
+
+  packetCount++;
 
   // TODO(aliu1): Parse DNS-specific data.
 }
@@ -144,7 +149,8 @@ void analyzePCAP(char *filePath,
     parsePCAPStream(cb);
     close(fd[0]);
     wait(NULL);
-    printf("done %s\n", filePath);
+    printf("done %s | packets: %d\n", filePath, packetCount);
+    packetCount = 0;
   }
 
 }

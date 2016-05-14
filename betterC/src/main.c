@@ -3,7 +3,6 @@
 #include <inttypes.h>
 #include <pcap/pcap.h>
 #include <poll.h>
-#include <pthread.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -49,21 +48,24 @@ int main(int argc, char *argv[]) {
     pollfds[i].events = POLLIN;
     pollfds[i].revents = 0;
 
-    // Spawn worker threads.
-    pthread_t tid;
-    if (pthread_create(&tid, NULL, worker_job, &workers[i])) {
-      err(EX_OSERR, "failed to spawn worker thread");
+    // Spawn worker processes.
+    if ((workers[i].pid = fork()) < 0) {
+      perror("fork() failed");
+      exit(1);
     }
-    // Automatically free thread resources.
-    pthread_detach(tid);
+
+    if (workers[i].pid == 0) { // is child process
+      worker_job(&workers[i]);
+      exit(0); // once worker is done, exit immediately
+    }
   }
 
   // Dispatch all jobs.
   for (int i = 0; i < numEntries; i++) {
     struct stat path_stat;
     stat(files[i], &path_stat);
-    if (!S_ISREG(path_stat.st_mode)) { // if not regular file
-      continue;
+    if (!S_ISREG(path_stat.st_mode)) {
+      continue; // if not regular file, skip
     }
 
     // Poll for ready worker.
