@@ -7,6 +7,7 @@
 
 #include "protocol.h"
 #include "util.h"
+#include "packetHandle.h"
 
 void *worker_job(void *args) {
   worker_t *worker = (worker_t *)args;
@@ -41,6 +42,7 @@ void *worker_job(void *args) {
 #endif
 
       // TODO(aliu1): Process the file here.
+      analyzePCAP((char *) payload, handlePacketCB);
       UNUSED(job_bytes_recvd);
       free(payload);
     } else {
