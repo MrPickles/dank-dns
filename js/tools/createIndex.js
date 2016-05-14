@@ -40,7 +40,7 @@ async.waterfall([
   if (err) {
     console.log('[Error] MongoDB Driver', err);
   } else {
-    console.log('[Info] Indeces created');
+    console.log('[Info] Indexes created');
   }
   dbConnection.close();
 });
