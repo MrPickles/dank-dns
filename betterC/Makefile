@@ -1,6 +1,6 @@
 CC = gcc
 CFLAGS = -Wall -Iinclude -g -std=gnu99
-LDLIBS = -lpcap -lpthread
+LDLIBS = -lpcap
 VPATH = src
 
 .PHONY: all clean

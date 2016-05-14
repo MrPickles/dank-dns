@@ -32,7 +32,7 @@ int main(int argc, char *argv[]) {
   worker_t *workers = calloc(workerCount, sizeof(worker_t));
   struct pollfd *pollfds = calloc(workerCount, sizeof(struct pollfd));
 
-  // Initialize worker threads.
+  // Initialize worker processes.
   for (int i = 0; i < workerCount; i++) {
     // Open pipe between worker and mediator.
     if (pipe(workers[i].parent_to_worker_fd) < 0) {
@@ -114,7 +114,7 @@ int main(int argc, char *argv[]) {
     UNUSED(job_bytes_sent);
   }
 
-  // Terminate worker threads.
+  // Terminate worker processes.
   int workersLeft = workerCount;
   while (workersLeft > 0) {
     // Poll for ready worker.
