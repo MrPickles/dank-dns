@@ -4,6 +4,7 @@ var lodash = require('lodash');
 var MongoClient = require('mongodb').MongoClient;
 var path = require('path');
 var config = require(path.join(__dirname, '../', 'config.js'));
+var validTLDs = require('./tools/validTLDs.json');
 
 var helpers = {
   cleanQuery : function(query) {
@@ -33,7 +34,8 @@ var helpers = {
   },
   connect : function(cb) {
     MongoClient.connect(config.db.url, cb);
-  }
+  },
+  validTLDs : validTLDs
 };
 
 module.exports = helpers;
