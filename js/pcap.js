@@ -13,6 +13,7 @@ var chalk = require('chalk');
 var cli = cmdLineArgs([
   { name : 'directory', alias : 'd', type : String, multiple : true },
   { name : 'workers', alias : 'w', type : Number, defaultValue : os.cpus().length },
+  { name : 'noDB', type : Boolean, defaultValue : false }
 ]);
 
 var options = cli.parse();
@@ -67,7 +68,8 @@ function dispatchJob(worker) {
     worker.send({
       filename : job,
       region : region,
-      timezoneId : timezoneId
+      timezoneId : timezoneId,
+      noDB : options.noDB
     });
     console.log(chalk.white('[Info] Sent job [%s] to worker #%d   \t| jobs left: %d'), path.basename(job), worker.workerID, jobs.length);
   } else {
@@ -128,6 +130,11 @@ process.on('SIGINT', function() {
     console.log(chalk.yellow('[Warning] ctrl+c detected, clearing work queue and gracefully waiting for workers to finish'));
     return false;
   } else {
+    workersArr.forEach(function(worker) {
+      if (worker.connected) {
+        worker.kill();
+      }
+    });
     process.exit(1);
   }
 });

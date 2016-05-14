@@ -42,10 +42,12 @@ process.on('message', function(msg) {
       if (err) {
         console.error('[Error] MongoDB Driver Error', err);
       } else if (count === 0) {
-        filesCollection.insert({
-          filename : basename
-        });
-        processPCAP(msg.filename, msg.timezoneId, msg.region);
+        if (!msg.noDB) {
+          filesCollection.insert({
+            filename : basename
+          });
+        }
+        processPCAP(msg.filename, msg.timezoneId, msg.region, msg.noDB);
       } else {
         process.send({
           duplicate : true,
@@ -58,7 +60,7 @@ process.on('message', function(msg) {
 });
 
 
-function processPCAP(filename, timezoneId, region) {
+function processPCAP(filename, timezoneId, region, noDB) {
   // Open file stream for decompression
   var fileStream = fs.createReadStream(filename);
   var decompressor = zlib.createGunzip();
@@ -74,12 +76,14 @@ function processPCAP(filename, timezoneId, region) {
   var inserted = 0;
 
   var bulkInsert = function(arr) {
-    collection.insert(arr, function(err) {
-      if (err) {
-        console.log(err);
-      }
-      inserted += arr.length;
-    });
+    if (!noDB) {
+      collection.insert(arr, function(err) {
+        if (err) {
+          console.log(err);
+        }
+        inserted += arr.length;
+      });
+    }
   };
 
   var responsePackets = 0;
@@ -180,4 +184,8 @@ function processPCAP(filename, timezoneId, region) {
 
 process.on('SIGINT', function() {
   // do nothing
+});
+
+process.on('SIGTERM', function() {
+  process.exit();
 });
