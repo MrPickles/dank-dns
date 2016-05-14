@@ -7,7 +7,7 @@ VPATH = src
 
 all: main
 
-main: main.o packetHandle.o worker.o protocol.o
+main: main.o packetHandle.o worker.o protocol.o optparser.o
 
 clean:
 	rm -rf *.o main

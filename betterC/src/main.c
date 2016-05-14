@@ -9,31 +9,22 @@
 #include <string.h>
 #include <sysexits.h>
 #include <unistd.h>
+#include <sys/stat.h>
 
 #include "packetHandle.h"
 #include "protocol.h"
 #include "util.h"
 #include "worker.h"
+#include "optparser.h"
 
 int main(int argc, char *argv[]) {
-  if (argc < 2) {
-    fprintf(stderr, "Usage: %s <pcap dir> [<worker count>]\n", argv[0]);
-    exit(1);
-  }
-
-  // Scan PCAP directory.
-  int numEntries;
-  struct dirent **entries;
-  if((numEntries = scandir(argv[1], &entries, NULL, alphasort)) < 0) {
-    fprintf(stderr, "Could not scan directory '%s'\n", argv[1]);
-    exit(1);
-  }
-
-  // Calculate number of worker threads.
+  
   int workerCount = -1;
-  if (argc > 2) {
-    workerCount = atoi(argv[2]);
-  }
+  char **files;
+  int numEntries;
+
+  optparser(argc, argv, &workerCount, &files, &numEntries);
+
   // Set number of workers to number of cores by default.
   if (workerCount < 1) {
     workerCount = sysconf(_SC_NPROCESSORS_ONLN);
@@ -69,8 +60,9 @@ int main(int argc, char *argv[]) {
 
   // Dispatch all jobs.
   for (int i = 0; i < numEntries; i++) {
-    // Ignore directories or irrelevant file types.
-    if (entries[i]->d_type != DT_REG) {
+    struct stat path_stat;
+    stat(files[i], &path_stat);
+    if (!S_ISREG(path_stat.st_mode)) { // if not regular file
       continue;
     }
 
@@ -113,7 +105,7 @@ int main(int argc, char *argv[]) {
     // Send job to worker.
     ssize_t written_bytes = write(write_fd, &jobCode, 1);
     ssize_t job_bytes_sent = send_job(write_fd,
-        strlen(entries[i]->d_name) + 1, (uint8_t *)entries[i]->d_name);
+        strlen(files[i]) + 1, (uint8_t *)files[i]);
 
     UNUSED(written_bytes);
     UNUSED(read_bytes);
