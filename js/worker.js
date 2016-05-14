@@ -49,10 +49,14 @@ process.on('message', function(msg) {
         }
         processPCAP(msg.filename, msg.timezoneId, msg.region, msg.noDB);
       } else {
-        process.send({
-          duplicate : true,
-          filename : basename
-        });
+        if (msg.noDB) {
+          processPCAP(msg.filename, msg.timezoneId, msg.region, msg.noDB);
+        } else {
+          process.send({
+            duplicate : true,
+            filename : basename
+          });
+        }
       }
     });
 
