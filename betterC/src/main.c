@@ -162,9 +162,7 @@ int main(int argc, char *argv[]) {
 
   free(workers);
   free(pollfds);
-  printf("done; press something to continue\n");
-  char w;
-  scanf("%c", &w);
+  printf("Finished processing %d job(s)\n", numEntries);
   return 0;
 }
 

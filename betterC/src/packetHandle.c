@@ -16,6 +16,8 @@ int packetCount = 0;
 void handlePacketCB(uint8_t *arg, const struct pcap_pkthdr *header,
     const uint8_t *packet) {
 
+  packetCount++;
+
   const int datalinkOffset = *((int *)arg);
 
   // Grab IP information, and apply any necessary rules.
@@ -23,6 +25,8 @@ void handlePacketCB(uint8_t *arg, const struct pcap_pkthdr *header,
   const uint8_t *payloadIP = (uint8_t *)headerIP + (headerIP->ip_hl * 4);
   uint32_t destIP = ntohl(headerIP->ip_dst.s_addr);
   uint32_t sourceIP = ntohl(headerIP->ip_src.s_addr);
+
+  int internetHeaderLength = headerIP->ip_hl * 4;
 
   // TODO(zxlin): Parse IPv6?
   if (headerIP->ip_v != 4) {
@@ -32,9 +36,16 @@ void handlePacketCB(uint8_t *arg, const struct pcap_pkthdr *header,
   // Grab the UDP information, and apply any necessary rules.
   const struct udphdr *headerUDP = (const struct udphdr *)payloadIP;
   const uint8_t *payloadUDP = (uint8_t *)headerUDP + 8;
-  const uint16_t payloadUDPSize = ntohs(headerUDP->len) - 8;
+  const uint16_t payloadUDPSize = ntohs(headerUDP->len);
   uint16_t sourcePort = ntohs(headerUDP->source);
   uint16_t destPort = ntohs(headerUDP->dest);
+
+  // Check if UDP payload size agrees with remaining packet size
+  int remainingBytes = header->caplen - datalinkOffset - internetHeaderLength;
+  if (payloadUDPSize > remainingBytes) {
+    // skip
+    return;
+  }
 
   UNUSED(destIP);
   UNUSED(sourceIP);
@@ -48,7 +59,7 @@ void handlePacketCB(uint8_t *arg, const struct pcap_pkthdr *header,
     return;
   }
 
-  packetCount++;
+
 
   // TODO(aliu1): Parse DNS-specific data.
 }
@@ -150,7 +161,7 @@ void analyzePCAP(char *filePath,
     close(fd[0]);
     wait(NULL);
     printf("done %s | packets: %d\n", filePath, packetCount);
-    packetCount = 0;
+    packetCount = 0; // reset
   }
 
 }
