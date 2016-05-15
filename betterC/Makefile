@@ -22,8 +22,7 @@ clean:
 	rm -rf *.o main
 
 distclean: clean
-	rm -rf local/
-	$(MAKE) clean -C third_party/mongo-c-driver
+	rm -rf local/ third_party/mongo-c-driver
 
 debug: CFLAGS += -DDEBUG
 debug: all
