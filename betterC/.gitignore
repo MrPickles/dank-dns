@@ -1,3 +1,7 @@
+# Mongo C Driver stuff
+local/
+mongo-c-driver/
+
 # Object files
 *.o
 *.ko
