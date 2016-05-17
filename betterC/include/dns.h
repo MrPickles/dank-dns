@@ -1,23 +1,9 @@
-#ifndef PACKET_H
-#define PACKET_H
+#ifndef DNS_H
+#define DNS_H
 
-typedef struct {
-  uint64_t uniqueID;
-  uint64_t time;
-  uint64_t curCaptureTime;
-  uint64_t lastCaptureTime;
-  uint64_t overallCaptureTime;
-  uint32_t sourceIP;
-  uint32_t destIP;
-  uint8_t payload[2048];
-  size_t size;
-} packet_t;
+#include <inttypes.h>
 
-
-typedef struct {
-  packet_t query;
-  packet_t answer;
-} dns_pair;
+#include "util.h"
 
 typedef struct {
   uint16_t id;       /* query identification number */
@@ -39,7 +25,18 @@ typedef struct {
 } dns_record;
 
 typedef struct {
-  
+  int error;
+  dns_header header;
+  dns_record record;
+  bool isDNSSEC;
 } dns_t;
 
+/*
+ * Takes a DNS query packet and parses out the data. This function only parses
+ * DNS responses and ignores queries, since the DNS response will have all the
+ * data that a query contains.
+ */
+int parseDNS(dns_t *out, const uint8_t *packet, const uint16_t size);
+
 #endif
+

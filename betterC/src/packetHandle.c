@@ -9,6 +9,7 @@
 #include <sysexits.h>
 #include <sys/wait.h>
 
+#include "dns.h"
 #include "util.h"
 
 int packetCount = 0;
@@ -51,17 +52,19 @@ void handlePacketCB(uint8_t *arg, const struct pcap_pkthdr *header,
   UNUSED(sourceIP);
   UNUSED(destPort);
   UNUSED(sourcePort);
-  UNUSED(payloadUDP);
 
-  // TODO(aliu1): Find out if this block is necessary.
+  // Check if packet size is too large to be a real UDP packet.
   if (payloadUDPSize > 2048) {
     fprintf(stderr, "Payload > 2048 bytes, skipping\n");
     return;
   }
 
-
-
   // TODO(aliu1): Parse DNS-specific data.
+  dns_t dns_out = {0};
+  int dnsCode = parseDNS(&dns_out, payloadUDP, payloadUDPSize);
+  UNUSED(dnsCode);
+
+  // TODO(aliu1): Use parsed DNS data.
 }
 
 void parsePCAPStream(void (*cb)(uint8_t *, const struct pcap_pkthdr *, const uint8_t *)) {
