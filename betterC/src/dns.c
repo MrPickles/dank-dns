@@ -1,5 +1,7 @@
 #include "dns.h"
 
+#include <arpa/inet.h>
+
 int parseDNS(dns_t *out, const uint8_t *packet, const uint16_t size) {
   // Check for valid header size or if packet is a query.
   if (size < 16 || !out || !packet || !(packet[2] >> 7)) {
