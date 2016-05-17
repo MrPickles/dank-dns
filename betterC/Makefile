@@ -5,7 +5,7 @@ LDFLAGS = -Llocal/lib
 LDLIBS = -lpcap -lmongoc-1.0 -lbson-1.0
 VPATH = src
 
-.PHONY: all clean distclean setup
+.PHONY: all clean distclean setup check
 
 all: setup main
 
@@ -18,8 +18,12 @@ setup:
 
 main: main.o packetHandle.o worker.o protocol.o optparser.o dns.o
 
+check:
+	$(MAKE) -C tests
+
 clean:
 	rm -rf *.o main
+	$(MAKE) clean -C tests
 
 distclean: clean
 	rm -rf local/ third_party/mongo-c-driver
