@@ -2,7 +2,8 @@ CC = gcc
 CFLAGS = -Wall -I../include
 VPATH = ../src
 
-PROGS = sample_test
+# Test binaries have the form *_test to be caught by the gitignore.
+PROGS = sample_test dnsHeader_test
 
 .PHONY: all clean
 
@@ -14,6 +15,7 @@ all: $(PROGS)
 	done
 
 sample_test: test.o sample_test.o
+dnsHeader_test: test.o dnsHeader_test.o dns.o
 
 clean:
 	rm -rf *.o $(PROGS)

@@ -19,5 +19,5 @@ void print_state(char *name, int val) {
 }
 
 void print_section(char *title) {
-  printf("------------\n%s\n------------\n", title);
+  printf("\n------------\n%s\n------------\n", title);
 }
