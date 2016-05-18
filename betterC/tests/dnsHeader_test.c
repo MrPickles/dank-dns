@@ -154,11 +154,11 @@ int main() {
   print_state("This message is not truncated", dns.header.tc == false);
   print_state("Recursion is not desired", dns.header.rd == false);
   print_state("Recursion is not available on the server", dns.header.ra == false);
-  print_state("Reponse code is 3", dns.header.rc == 3);
+  print_state("Response code is 3", dns.header.rc == 3);
   print_state("Question Count", dns.header.qdcount == 1);
-  print_state("Answer Count", dns.header.qdcount == 0);
-  print_state("Authority Count", dns.header.qdcount == 1);
-  print_state("Additional Count", dns.header.qdcount == 1);
+  print_state("Answer Count", dns.header.ancount == 0);
+  print_state("Authority Count", dns.header.nscount == 1);
+  print_state("Additional Count", dns.header.arcount == 1);
 
   print_section("Test DNSSEC");
 
