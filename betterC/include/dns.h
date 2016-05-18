@@ -39,5 +39,13 @@ typedef struct {
  */
 int parseDNS(dns_t *out, const uint8_t *packet, const uint16_t size);
 
+bool qr_dns(const dns_t *dns);
+bool aa_dns(const dns_t *dns);
+bool tc_dns(const dns_t *dns);
+bool rd_dns(const dns_t *dns);
+bool ra_dns(const dns_t *dns);
+uint8_t opcode_dns(const dns_t *dns);
+uint8_t rcode_dns(const dns_t *dns);
+
 #endif
 
