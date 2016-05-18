@@ -27,6 +27,11 @@ async.waterfall([
     });
   },
   function(d) {
+    collection.createIndex({ node : 1, time : 1, reqIP : 1 }, function(err, result) {
+      d(err);
+    });
+  },
+  function(d) {
     collection.createIndex({ reqIP : 1 }, function(err, result) {
       d(err);
     });
