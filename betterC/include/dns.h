@@ -34,8 +34,8 @@ typedef struct {
 typedef struct {
   int error;
   struct timeval packetTime;
-  uint32_t reqIP;
-  uint32_t resIP;
+  struct in_addr reqIP;
+  struct in_addr resIP;
   dns_header header;
   // For now, we only support one question record.
   dns_record question;

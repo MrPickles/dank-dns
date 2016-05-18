@@ -40,3 +40,6 @@ main
 # vim files
 *.swp
 *.swo
+
+# nfs artifacts
+.nfs*

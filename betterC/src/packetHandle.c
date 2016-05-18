@@ -8,15 +8,20 @@
 #include <unistd.h>
 #include <sysexits.h>
 #include <sys/wait.h>
+#include <regex.h>
 
 #include "dns.h"
 #include "util.h"
+#include "db.h"
+#include "packetHandle.h"
 
 int packetCount = 0;
+char *currReplica;
 
 void handlePacketCB(uint8_t *arg, const struct pcap_pkthdr *header,
     const uint8_t *packet) {
 
+  // increment packet count
   packetCount++;
 
   const int datalinkOffset = *((int *)arg);
@@ -24,8 +29,8 @@ void handlePacketCB(uint8_t *arg, const struct pcap_pkthdr *header,
   // Grab IP information, and apply any necessary rules.
   const struct ip *headerIP = (const struct ip *)(packet + datalinkOffset);
   const uint8_t *payloadIP = (uint8_t *)headerIP + (headerIP->ip_hl * 4);
-  uint32_t destIP = ntohl(headerIP->ip_dst.s_addr);
-  uint32_t sourceIP = ntohl(headerIP->ip_src.s_addr);
+  const struct in_addr destIP = headerIP->ip_dst;
+  const struct in_addr sourceIP = headerIP->ip_src;
 
   int internetHeaderLength = headerIP->ip_hl * 4;
 
@@ -62,9 +67,17 @@ void handlePacketCB(uint8_t *arg, const struct pcap_pkthdr *header,
   // TODO(aliu1): Parse DNS-specific data.
   dns_t dns_out = {0};
   int dnsCode = parseDNS(&dns_out, payloadUDP, payloadUDPSize);
+  dns_out.packetTime = header->ts; // set packet time
+  dns_out.replica = currReplica;
+  // only process response
+  if (dns_out.header.qr == 0) {
+    dns_out.reqIP = destIP;
+    dns_out.resIP = sourceIP;
+
+    insertIntoDB(&dns_out);
+  }
   UNUSED(dnsCode);
 
-  // TODO(aliu1): Use parsed DNS data.
 }
 
 void parsePCAPStream(void (*cb)(uint8_t *, const struct pcap_pkthdr *, const uint8_t *)) {
@@ -129,6 +142,27 @@ void parsePCAPStream(void (*cb)(uint8_t *, const struct pcap_pkthdr *, const uin
 void analyzePCAP(char *filePath,
     void (*cb)(uint8_t *, const struct pcap_pkthdr *, const uint8_t *)) {
 
+  // regex parse region
+  regex_t regex;
+  regmatch_t pmatch[2];
+  char replicaStr[REPLICA_MAX_LEN + 1] = {0};
+
+  if (regcomp(&regex, FILEPATH_REGEX, REG_ICASE|REG_EXTENDED) != 0) {
+    fprintf(stderr, "[Error] Filepath regular expression error\n");
+    exit(1);
+  }
+  if (regexec(&regex, filePath, 2, pmatch, 0) == 0) {
+    sprintf(replicaStr, "%.*s", pmatch[1].rm_eo - pmatch[1].rm_so, &filePath[pmatch[1].rm_so]);
+  } else {
+    fprintf(stderr, "[Error] Invalid filepath, did not pass regex check\n");
+    exit(1);
+  }
+  regfree(&regex);
+  currReplica = replicaStr;
+
+  // set up analysis
+
+  // set up forking
   pid_t child_pid;
   int fd[2];
   pipe(fd);
