@@ -5,7 +5,7 @@
 #include "dns.h"
 
 int main() {
-  print_section("DNS Header Test");
+  print_section("DNS Parsing Test");
   print_state("Empty packets should fail", parseDNS(NULL, NULL, 0) == -1);
 
   unsigned char payload1[] = {
@@ -26,6 +26,9 @@ int main() {
   print_state("Header 1 Answer Count", dns.header.ancount == 0);
   print_state("Header 1 Authority Count", dns.header.nscount == 0);
   print_state("Header 1 Additional Count", dns.header.arcount == 1);
+  print_state("Header 1 Domain Name Check", !strcmp(dns.record.name, "a17-07.rsw.kr2."));
+  print_state("Header 1 Question Type Check", dns.record.type == 1);
+  print_state("Header 1 Question Class Check", dns.record.class == 1);
 
   unsigned char dnsQuery[] = {
     0x82, 0x1e, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00,

@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -Wall -I../include
+CFLAGS = -Wall -I../include -g -std=gnu99
 VPATH = ../src
 
 # Test binaries have the form *_test to be caught by the gitignore.
