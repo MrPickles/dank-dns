@@ -41,12 +41,12 @@ int main() {
   print_state("Header 1 Authority Count", dns.header.nscount == 0);
   print_state("Header 1 Additional Count", dns.header.arcount == 1);
   print_state("Header 1 Domain Name Check",
-      !strcmp(dns.record.name, "a17-07.rsw.kr2."));
-  print_state("Header 1 Question Type Check", dns.record.type == 1);
-  print_state("Header 1 Question Class Check", dns.record.class == 1);
-  free(dns.record.name);
+      !strcmp(dns.question.name, "a17-07.rsw.kr2."));
+  print_state("Header 1 Question Type Check", dns.question.type == 1);
+  print_state("Header 1 Question Class Check", dns.question.class == 1);
+  free(dns.question.name);
 
-  char payload2[] = {
+  unsigned char payload2[] = {
     0x2b, 0xcb, 0x84, 0x00, 0x00, 0x01, 0x00, 0x0e,
     0x00, 0x00, 0x00, 0x08, 0x00, 0x00, 0x02, 0x00,
     0x01, 0x00, 0x00, 0x02, 0x00, 0x01, 0x00, 0x07,
@@ -123,10 +123,10 @@ int main() {
   print_state("Header 2 Authority Count", dns.header.nscount == 0);
   print_state("Header 2 Additional Count", dns.header.arcount == 8);
   print_state("Header 2 Domain Name Check",
-      !strcmp(dns.record.name, "."));
-  print_state("Header 2 Question Type Check", dns.record.type == 2);
-  print_state("Header 2 Question Class Check", dns.record.class == 1);
-  free(dns.record.name);
+      !strcmp(dns.question.name, "."));
+  print_state("Header 2 Question Type Check", dns.question.type == 2);
+  print_state("Header 2 Question Class Check", dns.question.class == 1);
+  free(dns.question.name);
 
 
   return 0;
