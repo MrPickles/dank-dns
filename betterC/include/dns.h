@@ -28,7 +28,7 @@ typedef struct {
   int error;
   dns_header header;
   // For now, we only support one question record.
-  dns_record record;
+  dns_record question;
   bool isDNSSEC;
 } dns_t;
 
