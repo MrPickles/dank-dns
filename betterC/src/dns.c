@@ -33,7 +33,13 @@ int parseDNS(dns_t *out, const uint8_t *packet, const uint16_t size) {
     return -1;
   }
 
-  out->record.name = calloc(name_len + 1, sizeof(char));
+  if (name_len) {
+    out->record.name = calloc(name_len + 1, sizeof(char));
+  } else {
+    // Specifically set the name for root server names.
+    out->record.name = calloc(2, sizeof(char));
+    out->record.name[0] = '.';
+  }
 
   // Load in the question name.
   index = 12;
