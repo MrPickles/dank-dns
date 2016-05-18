@@ -70,13 +70,12 @@ void handlePacketCB(uint8_t *arg, const struct pcap_pkthdr *header,
   dns_out.packetTime = header->ts; // set packet time
   dns_out.replica = currReplica;
   // only process response
-  if (dns_out.header.qr == 0) {
+  if (dnsCode != -1) {
     dns_out.reqIP = destIP;
     dns_out.resIP = sourceIP;
 
     insertIntoDB(&dns_out);
   }
-  UNUSED(dnsCode);
 
 }
 
