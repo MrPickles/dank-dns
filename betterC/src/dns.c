@@ -81,6 +81,8 @@ int parseDNS(dns_t *out, const uint8_t *packet, const uint16_t size) {
 
     if (type == 0x0029 && z == 0x8000) {
       out->isDNSSEC = true;
+    } else {
+      out->isDNSSEC = false;
     }
   }
 

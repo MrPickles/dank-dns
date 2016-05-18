@@ -32,6 +32,8 @@ typedef struct {
 
 typedef struct {
   int error;
+  uint32_t reqIP;
+  uint32_t resIP;
   dns_header header;
   // For now, we only support one question record.
   dns_record question;
