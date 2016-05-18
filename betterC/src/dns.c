@@ -59,3 +59,31 @@ int parseDNS(dns_t *out, const uint8_t *packet, const uint16_t size) {
   return 0;
 }
 
+bool qr_dns(const dns_t *dns) {
+  return dns->header.flags1 >> 7;
+}
+
+bool aa_dns(const dns_t *dns) {
+  return (dns->header.flags1 << 5) >> 7;
+}
+
+bool tc_dns(const dns_t *dns) {
+  return (dns->header.flags1 << 6) >> 7;
+}
+
+bool rd_dns(const dns_t *dns) {
+  return (dns->header.flags1 << 7) >> 7;
+}
+
+bool ra_dns(const dns_t *dns) {
+  return dns->header.flags2 >> 7;
+}
+
+uint8_t opcode_dns(const dns_t *dns) {
+  return (dns->header.flags1 << 1) >> 4;
+}
+
+uint8_t rcode_dns(const dns_t *dns) {
+  return (dns->header.flags2 << 4) >> 4;
+}
+
