@@ -2,9 +2,9 @@
 'use strict';
 
 var async = require('async'),
-    utils = require('./utils.js'),
-    moment = require('moment'),
-    cmdLineArgs = require('command-line-args');
+  utils = require('./utils.js'),
+  moment = require('moment'),
+  cmdLineArgs = require('command-line-args');
 
 
 var cli = cmdLineArgs([
@@ -56,6 +56,22 @@ async.waterfall([
     db = conn;
     collection = conn.collection('dns');
     timeStart = new Date();
+    /*
+    collection.count(
+      utils.cleanQuery({ 
+        time : { 
+          $gte : start,
+          $lte : stop
+        },
+//        node : 'sekr' 
+      }
+    ), function(err, count) {
+      timeStop = new Date();
+      console.log(count);
+      console.log('Query time: %d seconds', moment.duration(timeStop - timeStart).asSeconds()); 
+      d(err);
+    });
+    */
     collection.aggregate([
       { $match : utils.cleanQuery({ 
         time : { 
