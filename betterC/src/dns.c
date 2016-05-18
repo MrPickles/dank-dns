@@ -55,6 +55,27 @@ int parseDNS(dns_t *out, const uint8_t *packet, const uint16_t size) {
 
   out->question.type = ntohs(*((uint16_t *)(packet + index)));
   out->question.class = ntohs(*((uint16_t *)(packet + index + 2)));
+  index +=4;
+
+  if (out->header.arcount) {
+    uint8_t name = packet[index];
+    uint16_t type = ntohs(*(uint16_t *)(packet + index + 1));
+    uint16_t udpSize = ntohs(*(uint16_t *)(packet + index + 3));
+    uint8_t extRCODE = packet[index + 5];
+    uint8_t edns0Ver = packet[index + 6];
+    uint16_t z = ntohs(*(uint16_t *)(packet + index + 7));
+    uint16_t dataSize = ntohs(*(uint16_t *)(packet + index + 9));
+
+    UNUSED(name);
+    UNUSED(udpSize);
+    UNUSED(extRCODE);
+    UNUSED(edns0Ver);
+    UNUSED(dataSize);
+
+    if (type == 0x0029 && z == 0x8000) {
+      out->isDNSSEC = true;
+    }
+  }
 
   return 0;
 }
