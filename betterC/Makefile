@@ -16,7 +16,7 @@ setup:
 		exit 1;\
 	fi
 
-main: main.o packetHandle.o worker.o protocol.o optparser.o dns.o
+main: main.o packetHandle.o worker.o protocol.o optparser.o dns.o db.o
 
 check:
 	$(MAKE) -C tests

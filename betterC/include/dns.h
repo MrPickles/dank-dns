@@ -2,6 +2,7 @@
 #define DNS_H
 
 #include <inttypes.h>
+#include <sys/time.h>
 
 #include "util.h"
 
@@ -32,12 +33,14 @@ typedef struct {
 
 typedef struct {
   int error;
+  struct timeval packetTime;
   uint32_t reqIP;
   uint32_t resIP;
   dns_header header;
   // For now, we only support one question record.
   dns_record question;
   bool isDNSSEC;
+  char *replica;
 } dns_t;
 
 /*
