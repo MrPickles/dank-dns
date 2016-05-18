@@ -1,10 +1,12 @@
 #ifndef PACKET_HANDLE_H
 #define PACKET_HANDLE_H
 
+#include <pcap/pcap.h>
+
 /*
  * Parses the packet and extracts DNS data from the packet.
  */
-void handlePacket(uint8_t *arg, const struct pcap_pkthdr *header,
+void handlePacketCB(uint8_t *arg, const struct pcap_pkthdr *header,
     const uint8_t *packet);
 
 /*

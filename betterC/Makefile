@@ -1,16 +1,32 @@
 CC = gcc
-CFLAGS = -Wall -Iinclude -g -std=gnu99
-LDLIBS = -lpcap -lpthread
+CFLAGS = -Wall -Iinclude -Ilocal/include/libbson-1.0 \
+				 -Ilocal/include/libmongoc-1.0 -g -std=gnu99
+LDFLAGS = -Llocal/lib
+LDLIBS = -lpcap -lmongoc-1.0 -lbson-1.0
 VPATH = src
 
-.PHONY: all clean
+.PHONY: all clean distclean setup check
 
-all: main
+all: setup main
 
-main: main.o packetHandle.o worker.o protocol.o
+setup:
+	@if [ ! -d ./local ];then\
+		echo 'Please run the configuration script (./configure) before'\
+			'running the Makefile.';\
+		exit 1;\
+	fi
+
+main: main.o packetHandle.o worker.o protocol.o optparser.o dns.o
+
+check:
+	$(MAKE) -C tests
 
 clean:
 	rm -rf *.o main
+	$(MAKE) clean -C tests
+
+distclean: clean
+	rm -rf local/ third_party/mongo-c-driver
 
 debug: CFLAGS += -DDEBUG
 debug: all

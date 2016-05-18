@@ -1,0 +1,28 @@
+#!/bin/bash
+
+# Set up Mongo C driver.
+if [ ! -d ./local ]; then
+  echo "Setting up Mongo C driver..."
+  mkdir -p ./third_party
+  wget https://github.com/mongodb/mongo-c-driver/releases/download/1.3.5/mongo-c-driver-1.3.5.tar.gz -O third_party/mongo-c-driver.tar.gz
+  cd third_party && tar -zxvf mongo-c-driver.tar.gz && cd ../
+  rm third_party/mongo-c-driver.tar.gz
+  mv third_party/mongo-c-driver-1.3.5 third_party/mongo-c-driver
+  cd third_party/mongo-c-driver && ./configure --prefix=`pwd`/../../local && cd ../../
+	make -C third_party/mongo-c-driver
+	make install -C third_party/mongo-c-driver
+else
+  echo "Mongo C driver libraries have already been set..."
+  echo -e "\t...skipping driver configuration."
+fi
+
+# Check if the driver dynamic libs are in path.
+if [[ :$LD_LIBRARY_PATH: == *:"`pwd`/local/lib":* ]]; then
+  echo "Mongo driver libraries already in path; skipping..."
+  echo -e "\t...configuration complete."
+else
+  echo "The Mongo driver libraries are not in your path..."
+  echo "Please run the following command:"
+  echo -e "\t$ export LD_LIBRARY_PATH=\$LD_LIBRARY_PATH:$PWD/local/lib"
+fi
+

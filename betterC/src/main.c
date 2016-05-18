@@ -3,37 +3,27 @@
 #include <inttypes.h>
 #include <pcap/pcap.h>
 #include <poll.h>
-#include <pthread.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <sysexits.h>
 #include <unistd.h>
+#include <sys/stat.h>
 
 #include "packetHandle.h"
 #include "protocol.h"
 #include "util.h"
 #include "worker.h"
+#include "optparser.h"
 
 int main(int argc, char *argv[]) {
-  if (argc < 2) {
-    fprintf(stderr, "Usage: %s <pcap dir> [<worker count>]\n", argv[0]);
-    exit(1);
-  }
-
-  // Scan PCAP directory.
-  int numEntries;
-  struct dirent **entries;
-  if((numEntries = scandir(argv[1], &entries, NULL, alphasort)) < 0) {
-    fprintf(stderr, "Could not scan directory '%s'\n", argv[1]);
-    exit(1);
-  }
-
-  // Calculate number of worker threads.
+  
   int workerCount = -1;
-  if (argc > 2) {
-    workerCount = atoi(argv[2]);
-  }
+  char **files;
+  int numEntries;
+
+  optparser(argc, argv, &workerCount, &files, &numEntries);
+
   // Set number of workers to number of cores by default.
   if (workerCount < 1) {
     workerCount = sysconf(_SC_NPROCESSORS_ONLN);
@@ -42,7 +32,7 @@ int main(int argc, char *argv[]) {
   worker_t *workers = calloc(workerCount, sizeof(worker_t));
   struct pollfd *pollfds = calloc(workerCount, sizeof(struct pollfd));
 
-  // Initialize worker threads.
+  // Initialize worker processes.
   for (int i = 0; i < workerCount; i++) {
     // Open pipe between worker and mediator.
     if (pipe(workers[i].parent_to_worker_fd) < 0) {
@@ -58,20 +48,24 @@ int main(int argc, char *argv[]) {
     pollfds[i].events = POLLIN;
     pollfds[i].revents = 0;
 
-    // Spawn worker threads.
-    pthread_t tid;
-    if (pthread_create(&tid, NULL, worker_job, &workers[i])) {
-      err(EX_OSERR, "failed to spawn worker thread");
+    // Spawn worker processes.
+    if ((workers[i].pid = fork()) < 0) {
+      perror("fork() failed");
+      exit(1);
     }
-    // Automatically free thread resources.
-    pthread_detach(tid);
+
+    if (workers[i].pid == 0) { // is child process
+      worker_job(&workers[i]);
+      exit(0); // once worker is done, exit immediately
+    }
   }
 
   // Dispatch all jobs.
   for (int i = 0; i < numEntries; i++) {
-    // Ignore directories or irrelevant file types.
-    if (entries[i]->d_type != DT_REG) {
-      continue;
+    struct stat path_stat;
+    stat(files[i], &path_stat);
+    if (!S_ISREG(path_stat.st_mode)) {
+      continue; // if not regular file, skip
     }
 
     // Poll for ready worker.
@@ -113,14 +107,14 @@ int main(int argc, char *argv[]) {
     // Send job to worker.
     ssize_t written_bytes = write(write_fd, &jobCode, 1);
     ssize_t job_bytes_sent = send_job(write_fd,
-        strlen(entries[i]->d_name) + 1, (uint8_t *)entries[i]->d_name);
+        strlen(files[i]) + 1, (uint8_t *)files[i]);
 
     UNUSED(written_bytes);
     UNUSED(read_bytes);
     UNUSED(job_bytes_sent);
   }
 
-  // Terminate worker threads.
+  // Terminate worker processes.
   int workersLeft = workerCount;
   while (workersLeft > 0) {
     // Poll for ready worker.
@@ -168,9 +162,7 @@ int main(int argc, char *argv[]) {
 
   free(workers);
   free(pollfds);
-  printf("done; press something to continue\n");
-  char w;
-  scanf("%c", &w);
+  printf("Finished processing %d job(s)\n", numEntries);
   return 0;
 }
 

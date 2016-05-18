@@ -1,3 +1,7 @@
+# Mongo C Driver stuff
+local/
+mongo-c-driver/
+
 # Object files
 *.o
 *.ko
@@ -27,7 +31,12 @@
 *.i*86
 *.x86_64
 *.hex
+main
 
 # Debug files
 *.dSYM/
 *.su
+
+# vim files
+*.swp
+*.swo

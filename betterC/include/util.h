@@ -3,5 +3,7 @@
 
 #define UNUSED(x) ((void)(x))
 
+typedef enum { false, true } bool;
+
 #endif
 
