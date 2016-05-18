@@ -13,6 +13,13 @@ int parseDNS(dns_t *out, const uint8_t *packet, const uint16_t size) {
   out->header.id = ntohs(*((uint16_t *)packet));
   out->header.flags1 = packet[2];
   out->header.flags2 = packet[3];
+  out->header.qr = qr_dns(out);
+  out->header.aa = aa_dns(out);
+  out->header.tc = tc_dns(out);
+  out->header.rd = rd_dns(out);
+  out->header.ra = ra_dns(out);
+  out->header.rc = opcode_dns(out);
+  out->header.rc = rcode_dns(out);
   out->header.qdcount = ntohs(*((uint16_t *)(packet + 4)));
   out->header.ancount = ntohs(*((uint16_t *)(packet + 6)));
   out->header.nscount = ntohs(*((uint16_t *)(packet + 8)));
