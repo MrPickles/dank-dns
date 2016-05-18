@@ -9,6 +9,11 @@ typedef struct {
   uint16_t id;       /* query identification number */
   uint8_t  flags1;   /* first byte of flags */
   uint8_t  flags2;   /* second byte of flags */
+  bool aa;           /* authoritative answer */
+  bool tc;           /* truncation flag */
+  bool rd;           /* recursion desired */
+  bool ra;           /* recursion available */
+  uint16_t rc;       /* response code */
   uint16_t qdcount;  /* number of question entries */
   uint16_t ancount;  /* number of answer entries */
   uint16_t nscount;  /* number of authority entries */
