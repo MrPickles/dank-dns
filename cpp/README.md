@@ -1,4 +1,4 @@
-# Dank DNS
+# Dank DNS Legacy Implementation
 
 DankDNS is a DNS pcap processing tool that will all your dreams come true by taking pcaps with DNS queries and putting the question/response pairs into a format that is directly readable by disk. Notice that I am purposefully being vague due to a lack of implementation here. Will we write C structs directly to disk? Use a database? Stay tuned to find out!
 
