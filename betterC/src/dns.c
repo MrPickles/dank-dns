@@ -34,11 +34,11 @@ int parseDNS(dns_t *out, const uint8_t *packet, const uint16_t size) {
   }
 
   if (name_len) {
-    out->record.name = calloc(name_len + 1, sizeof(char));
+    out->question.name = calloc(name_len + 1, sizeof(char));
   } else {
     // Specifically set the name for root server names.
-    out->record.name = calloc(2, sizeof(char));
-    out->record.name[0] = '.';
+    out->question.name = calloc(2, sizeof(char));
+    out->question.name[0] = '.';
   }
 
   // Load in the question name.
@@ -47,14 +47,14 @@ int parseDNS(dns_t *out, const uint8_t *packet, const uint16_t size) {
   while (packet[index]) {
     int octet_len = packet[index++];
     for (int i = 0; i < octet_len; i++) {
-      out->record.name[str_index++] = packet[index++];
+      out->question.name[str_index++] = packet[index++];
     }
-    out->record.name[str_index++] = '.';
+    out->question.name[str_index++] = '.';
   }
   index++;
 
-  out->record.type = ntohs(*((uint16_t *)(packet + index)));
-  out->record.class = ntohs(*((uint16_t *)(packet + index + 2)));
+  out->question.type = ntohs(*((uint16_t *)(packet + index)));
+  out->question.class = ntohs(*((uint16_t *)(packet + index + 2)));
 
   return 0;
 }
