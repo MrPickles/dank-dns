@@ -5,7 +5,7 @@
 
 int parseDNS(dns_t *out, const uint8_t *packet, const uint16_t size) {
   // Check for valid header size or if packet is a query.
-  if (size < 16 || !out || !packet || !(packet[2] >> 7)) {
+  if (size < 16 || !out || !packet || !(packet[2] >> 7 & 1)) {
     return -1;
   }
 
@@ -16,10 +16,9 @@ int parseDNS(dns_t *out, const uint8_t *packet, const uint16_t size) {
   out->header.qr = out->header.flags1 >> 7 & 1;
   out->header.aa = out->header.flags1 >> 2 & 1;
   out->header.tc = out->header.flags1 >> 1 & 1;
-  out->header.rd = out->header.flags1 & 1;
+  out->header.rd = out->header.flags1 >> 0 & 1;
   out->header.ra = out->header.flags2 >> 7 & 1;
-  out->header.rc = out->header.flags1 >> 3 & 7;
-  out->header.rc = out->header.flags2 & 15;
+  out->header.rc = out->header.flags2 & 0x0F;
   out->header.qdcount = ntohs(*((uint16_t *)(packet + 4)));
   out->header.ancount = ntohs(*((uint16_t *)(packet + 6)));
   out->header.nscount = ntohs(*((uint16_t *)(packet + 8)));
