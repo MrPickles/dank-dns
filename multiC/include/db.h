@@ -8,7 +8,7 @@
 #define MONGODB_COLLECTION "test"
 #define MONGODB_INSERT_CACHE 10000
 
-/* set this value to zero to avoid saving to the databse */
+/* set this value to zero to avoid saving to the database */
 #define USE_MONGODB 1
 
 /* 
