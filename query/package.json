@@ -4,7 +4,10 @@
   "description": "",
   "main": "pcap.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "qps": "node qps.js",
+    "topHost": "node topHost.js",
+    "topRequest": "node topRequest.js"
   },
   "author": "",
   "license": "UNLICENSED",
