@@ -64,6 +64,8 @@ int parseDNS(dns_t *out, const uint8_t *packet, const uint16_t size) {
   index +=4;
 
   if (out->header.arcount) {
+    // Relevant DNSSEC data should be the final section of the packet.
+    index = size - 11;
     uint8_t name = packet[index];
     uint16_t type = ntohs(*(uint16_t *)(packet + index + 1));
     uint16_t udpSize = ntohs(*(uint16_t *)(packet + index + 3));
@@ -80,8 +82,6 @@ int parseDNS(dns_t *out, const uint8_t *packet, const uint16_t size) {
 
     if (type == 0x0029 && z == 0x8000) {
       out->isDNSSEC = true;
-    } else {
-      out->isDNSSEC = false;
     }
   }
 
