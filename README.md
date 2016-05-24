@@ -16,6 +16,11 @@ The improved C implementation is in `multiC/`. This code multiprocesses the
 loading of the DNS data into MongoDB. More details can be found in the
 `README.md` file in its specific folder.
 
+Sample query scripts can be found in `query/`. This directory contains scripts
+to query MongoDB for queries per second (QPS), the top hosts, and top requests.
+Additional documentation can be found in the `README.md` file of the
+subdirectory.
+
 ## Database Schema
 The database will hold a collection of DNS queries. Specifically, each query
 will have the following schema:
