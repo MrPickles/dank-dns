@@ -113,7 +113,7 @@ int main() {
     0x00, 0x80, 0x00, 0x00, 0x00
   };
   memset(&dns, 0, sizeof(dns));
-  parseDNS(&dns, payload2, sizeof(payload1));
+  parseDNS(&dns, payload2, sizeof(payload2));
 
   print_state("Header 2 ID Check", dns.header.id == 0x2bcb);
   print_state("Header 2 Flag Check",
@@ -147,7 +147,7 @@ int main() {
   };
 
   memset(&dns, 0, sizeof(dns));
-  parseDNS(&dns, response, sizeof(payload1));
+  parseDNS(&dns, response, sizeof(response));
 
   print_state("This is a response", dns.header.qr == 1);
   print_state("This is an authoritative answer", dns.header.aa == true);
@@ -314,7 +314,7 @@ int main() {
   };
 
   memset(&dns, 0, sizeof(dns));
-  parseDNS(&dns, dnssec, sizeof(payload1));
+  parseDNS(&dns, dnssec, sizeof(dnssec));
 
   print_state("This has DNSSEC", dns.isDNSSEC == true);
 
