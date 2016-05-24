@@ -2,8 +2,7 @@
 
 var lodash = require('lodash');
 var MongoClient = require('mongodb').MongoClient;
-var path = require('path');
-var config = require(path.join(__dirname, '../', 'config.js'));
+var config = require('./config.js');
 var validTLDs = require('./tools/validTLDs.json');
 
 var helpers = {
