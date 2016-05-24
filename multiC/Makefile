@@ -1,6 +1,7 @@
 CC = gcc
-CFLAGS = -Wall -Iinclude -Ilocal/include/libbson-1.0 \
-				 -Ilocal/include/libmongoc-1.0 -g -std=gnu99
+CFLAGS = -Wall -g -std=gnu99 -I. -Iinclude \
+				 -Ilocal/include/libbson-1.0 \
+				 -Ilocal/include/libmongoc-1.0
 LDFLAGS = -Llocal/lib
 LDLIBS = -lpcap -lmongoc-1.0 -lbson-1.0
 VPATH = src

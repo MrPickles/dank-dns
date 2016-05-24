@@ -2,6 +2,7 @@
 #include <bcon.h>
 #include <mongoc.h>
 
+#include "config.h"
 #include "util.h"
 #include "db.h"
 
@@ -15,7 +16,6 @@ char *replica;
 
 void connectToDB() {
 #if USE_MONGODB == 1
-
   // required to init libmongoc's internals
   mongoc_init();
 
