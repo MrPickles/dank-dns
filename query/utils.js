@@ -34,7 +34,8 @@ var helpers = {
   connect : function(cb) {
     MongoClient.connect(config.db.url, cb);
   },
-  validTLDs : validTLDs
+  validTLDs : validTLDs,
+  collection: config.db.collection
 };
 
 module.exports = helpers;

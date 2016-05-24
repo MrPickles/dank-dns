@@ -54,7 +54,7 @@ async.waterfall([
   function(conn, d) {
     console.log('Connected to DB');
     db = conn;
-    collection = conn.collection('dns');
+    collection = conn.collection(utils.collection);
     timeStart = new Date();
     /*
     collection.count(
