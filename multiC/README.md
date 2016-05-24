@@ -1,4 +1,4 @@
-# Dank DNS Improved C Implementation
+# Dank DNS: Improved C Implementation
 
 The improved implementation of the DNS processor includes three major
 optimizations.
@@ -23,8 +23,12 @@ about data.
    sudo apt-get install libpcap-dev -y
    ```
 
-2. Configure and compile the processor.
+2. Configure and compile the processor. Configuration definitions are in
+`config.h`. Within that file, you can set the database name, collection, cache
+size, port, and even whether to use a database. The `configure` script to fetch
+third party dependencies and check that the dynamic library path is set.
    ```bash
+   vim config.h # edit definitions to your choosing
    ./configure && make
    ```
 
