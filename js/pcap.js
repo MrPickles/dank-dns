@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 'use strict';
 
 var path = require('path'),
@@ -20,7 +19,7 @@ var options = cli.parse();
 
 // check if capture directory is present
 if (!options.directory) {
-  console.error('usage: node %s -d <capture dir> -w [# of workers]', path.basename(process.argv[1]));
+  console.error('usage: npm run start -- -d <capture dir> -w [# of workers]');
   process.exit(1);
 }
 
