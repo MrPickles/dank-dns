@@ -4,6 +4,7 @@
 #include <string.h>
 
 #include "dns.h"
+#include "util.h"
 
 int main() {
   print_section("DNS Parsing Test");
@@ -32,6 +33,7 @@ int main() {
   };
   memset(&dns, 0, sizeof(dns));
   parseDNS(&dns, payload1, sizeof(payload1));
+  bool payload1_DNSSEC = dns.isDNSSEC;
 
   print_state("Header 1 ID Check", dns.header.id == 0x821e);
   print_state("Header 1 Flag Check",
@@ -114,6 +116,7 @@ int main() {
   };
   memset(&dns, 0, sizeof(dns));
   parseDNS(&dns, payload2, sizeof(payload2));
+  bool payload2_DNSSEC = dns.isDNSSEC;
 
   print_state("Header 2 ID Check", dns.header.id == 0x2bcb);
   print_state("Header 2 Flag Check",
@@ -148,6 +151,7 @@ int main() {
 
   memset(&dns, 0, sizeof(dns));
   parseDNS(&dns, response, sizeof(response));
+  bool response_DNSSEC = dns.isDNSSEC;
 
   print_state("This is a response", dns.header.qr == 1);
   print_state("This is an authoritative answer", dns.header.aa == true);
@@ -316,7 +320,10 @@ int main() {
   memset(&dns, 0, sizeof(dns));
   parseDNS(&dns, dnssec, sizeof(dnssec));
 
-  print_state("This has DNSSEC", dns.isDNSSEC == true);
+  print_state("DNSSEC example has DNSSEC", dns.isDNSSEC);
+  print_state("Header 1 example has DNSSEC", payload1_DNSSEC);
+  print_state("Header 2 example has DNSSEC", payload2_DNSSEC);
+  print_state("Response example does not have DNSSEC", !response_DNSSEC);
 
   return 0;
 }
