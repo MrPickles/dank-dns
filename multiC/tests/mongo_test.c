@@ -46,7 +46,7 @@ int main (int argc, char *argv[]) {
   print_state("Can ping MongoDB", retval);
 
   str = bson_as_json(&reply, NULL);
-  printf("%s\n", str);
+  print_state("Mongo ping reply approved", !strcmp(str, "{ \"ok\" : 1 }"));
 
   insert = BCON_NEW("hello", BCON_UTF8 ("world"));
 
